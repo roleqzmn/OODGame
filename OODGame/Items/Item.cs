@@ -9,19 +9,19 @@ namespace OODGame.Items
 {
     public interface Item
     {
-        string Name { get; }
-        string Description { get; }
-        char Symbol { get; }
-        void OnPickedUp(Player.Player player);
-        bool TryEquip(Player.Player player);
+        public string Name { get; }
+        public string Description { get; }
+        public char Symbol { get; }
+        public void OnPickedUp(Player.Player player);
+        public bool TryEquip(Player.Player player);
     }
     public interface Weapon : Item
     {
-        int Damage { get; set; }
-        int MinLvl { get; }
-        int MaxLvl { get; }
-        bool TryAttack(Player.Player player);
-        bool OnAttack(Player.Player player);
+        public int Damage { get; set; }
+        public int MinLvl { get; }
+        public int MaxLvl { get; }
+        public bool TryAttack(Player.Player player);
+        public void OnAttack(Player.Player player);
     }
 
 }
