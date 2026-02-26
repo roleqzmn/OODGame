@@ -4,24 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OODGame.Player;
+using OODGame.Entities;
 
 namespace OODGame.Items
 {
-    public interface Item
+    public abstract class Item
     {
-        public string Name { get; }
-        public string Description { get; }
-        public char Symbol { get; }
-        public void OnPickedUp(Player.Player player);
-        public bool TryEquip(Player.Player player);
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public char Symbol { get; set; }
+        public Int16 Weight { get; set; }
+        public abstract void OnPickedUp(Player.Player player);
+        public abstract bool CanEquip(Player.Player player);
+        public Item(){
+            Name=String.Empty; Description=String.Empty;
+        }
     }
-    public interface Weapon : Item
+    public abstract class Weapon : Item
     {
-        public int Damage { get; set; }
-        public int MinLvl { get; }
-        public int MaxLvl { get; }
-        public bool TryAttack(Player.Player player);
-        public void OnAttack(Player.Player player);
+        public Int16 Damage { get; set; }
+        public Int16 MinLvl { get; set; }
+        public Int16 AttackRate { get; set; }
+        public Int16 Range { get; set; }
+        public abstract bool IsTwoHanded { get; }
+        public abstract void Attack(Player.Player player, IEnemy enemy);
     }
-
+    public abstract class Armor : Item
+    {
+        public Int16 ArmorPoints {  get; set; }
+    }
 }

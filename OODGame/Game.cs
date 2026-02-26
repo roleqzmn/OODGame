@@ -1,4 +1,5 @@
-﻿using OODGame.Map;
+﻿using OODGame.Items;
+using OODGame.Map;
 using OODGame.Player;
 using System;
 using System.Collections.Generic;
@@ -90,7 +91,6 @@ namespace OODGame
             Console.SetCursorPosition(game.Player.x_pos, game.Player.y_pos);
             Console.Write(game.Player.Symbol);
         }
-
         public static void ErasePlayer(Game game)
         {
             Console.SetCursorPosition(game.Player.x_pos, game.Player.y_pos);
@@ -128,6 +128,9 @@ namespace OODGame
             Console.Write($"Coins: {game.Player.Stats.Coins} | Gold: {game.Player.Stats.Gold}    ");
 
         }
+        public static void DrawItems(List<Item> items)
+        {
 
+        }
     }
 }
