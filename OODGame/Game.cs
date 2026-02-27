@@ -1,6 +1,6 @@
 ﻿using OODGame.Items;
 using OODGame.Map;
-using OODGame.Player;
+using OODGame.Players;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,12 +13,12 @@ namespace OODGame
     {
         public Room CurrentRoom { get; set; }
         public Room[,] Map { get; set; } //placeholder for later
-        public Player.Player Player { get; set; }
+        public Player Player { get; set; }
         bool IsRunning { get; set; }
         public Game()
         {
             CurrentRoom = new Room();
-            Player = new Player.Player();
+            Player = new Player();
             Map = new Room[1, 1]; //placeholder for generation
         }
         public void Run()
@@ -40,9 +40,9 @@ namespace OODGame
         {
             var key = Console.ReadKey(true).Key;
 
-            int newX = Player.x_pos;
-            int newY = Player.y_pos;
-            Tile tile = CurrentRoom.Grid[Player.y_pos, Player.x_pos];
+            int newX = Player.Xpos;
+            int newY = Player.Ypos;
+            Tile tile = CurrentRoom.Grid[Player.Ypos, Player.Xpos];
             switch (key)
             {
                 case ConsoleKey.W: newY--; break;
@@ -66,8 +66,8 @@ namespace OODGame
             {
                 Draw.ErasePlayer(this);
 
-                Player.x_pos = newX;
-                Player.y_pos = newY;
+                Player.Xpos = newX;
+                Player.Ypos = newY;
 
                 Draw.DrawPlayer(this);
             }
@@ -89,13 +89,13 @@ namespace OODGame
         }
         public static void DrawPlayer(Game game)
         {
-            Console.SetCursorPosition(game.Player.x_pos, game.Player.y_pos);
+            Console.SetCursorPosition(game.Player.Xpos, game.Player.Ypos);
             Console.Write(game.Player.Symbol);
         }
         public static void ErasePlayer(Game game)
         {
-            Console.SetCursorPosition(game.Player.x_pos, game.Player.y_pos);
-            Console.Write(game.CurrentRoom.Grid[game.Player.y_pos, game.Player.x_pos].Symbol);
+            Console.SetCursorPosition(game.Player.Xpos, game.Player.Ypos);
+            Console.Write(game.CurrentRoom.Grid[game.Player.Ypos, game.Player.Xpos].Symbol);
         }
         public static void DrawUI(Game game)
         {
@@ -141,10 +141,18 @@ namespace OODGame
         {
             throw new NotImplementedException();
         }
-
         public static void EraseItem() 
         {
             throw new NotImplementedException();
         }
+        public static void DrawEq(Player player)
+        {
+            throw new NotImplementedException();
+        }
+        public static void EraseEq()
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OODGame.Items;
 
-namespace OODGame.Player
+namespace OODGame.Players
 {
     public class Attributes
     {
@@ -46,22 +46,23 @@ namespace OODGame.Player
     }
     public class Player
     {
-        public int x_pos { get; set; }
-        public int y_pos { get; set; }
+        public int Xpos { get; set; }
+        public int Ypos { get; set; }
         public int Level { get; set; }
         public int Experience { get; set; }
         public int SkillPoints { get; set; }
         public Attributes Stats { get; private set; }
-        EquippedItems EArmor { get; set; }
+        public EquippedItems EItems { get; set; }
         public string Name { get; }
         public List<Item> Inventory { get; set; } //for later
         public char Symbol { get; } = '¶';
         public Player(int startX = 0, int startY = 0, string name = "roleq"){
-            x_pos = startX;
-            y_pos = startY;
+            Xpos = startX;
+            Ypos = startY;
             Name = name;
             Inventory = new List<Item>();
             Stats = new Attributes(10, 10, 100, 5, 2, 5, 20);
+            EItems = new EquippedItems();
         }
         public bool CanPickup(Item item){
             return (item.Weight + Stats.CurrentLoad < Stats.InventoryLimit);
@@ -71,7 +72,7 @@ namespace OODGame.Player
         }
         public void OpenInventory()
         {
-            int i=0; var size = Inventory.Count;
+            int i=0, size = Inventory.Count;
             Draw.DrawItems(Inventory);
             Draw.DrawItem(Inventory[i]);
             while (true)
@@ -80,10 +81,26 @@ namespace OODGame.Player
 
                 switch (key)
                 {
-                    case ConsoleKey.Escape: Draw.EraseItems(); Draw.EraseItem(); return;
-                    case ConsoleKey.LeftArrow: if (i > 0) i--; Draw.EraseItem(); Draw.DrawItem(Inventory[i]); break;
-                    case ConsoleKey.RightArrow: if (i < size-1) i++; Draw.EraseItem(); Draw.DrawItem(Inventory[i]); break;
-                    case ConsoleKey.E: if (Inventory[i].CanEquip(this)) Inventory[i].Equip(this); Inventory.RemoveAt(i); break;
+                    case ConsoleKey.Escape: 
+                        Draw.EraseItems(); Draw.EraseItem();
+                        return;
+                    case ConsoleKey.LeftArrow: 
+                        if (i > 0) 
+                            i--; 
+                        Draw.EraseItem(); Draw.DrawItem(Inventory[i]); 
+                        break;
+                    case ConsoleKey.RightArrow: 
+                        if (i < size-1) 
+                            i++; 
+                        Draw.EraseItem(); Draw.DrawItem(Inventory[i]); 
+                        break;
+                    case ConsoleKey.E: 
+                        if (Inventory[i].CanEquip(this)) 
+                        {
+                            Inventory[i].Equip(this); 
+                            Inventory.RemoveAt(i); 
+                        } 
+                        break;
                     default: break;
                 }
             }

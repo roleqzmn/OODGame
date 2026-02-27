@@ -1,6 +1,6 @@
 ﻿using OODGame;
 using OODGame.Map;
-using OODGame.Player;
+using OODGame.Players;
 using System.Text;
 
 namespace ODDGame

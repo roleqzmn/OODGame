@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OODGame.Players;
 
 namespace OODGame.Items.Weapons
 {
@@ -21,23 +22,31 @@ namespace OODGame.Items.Weapons
             Name = "Two-handed Axe";
         }
 
-        public override void OnPickedUp(Player.Player player)
+        public override void OnPickedUp(Player player)
         {
             if (player.CanPickup(this))
                 player.Pickup(this);
         }
-        public override void Attack(Player.Player player, IEnemy enemy)
+        public override void Attack(Player player, IEnemy enemy)
         {
             throw new NotImplementedException();
         }
 
-        public override bool CanEquip(Player.Player player)
+        public override bool CanEquip(Player player)
         {
             return player.Level >= MinLvl;
         }
-        public override void Equip(Player.Player player)
+        public override void Equip(Player player)
         {
-            throw new NotImplementedException();
+            if(player.EItems.HasTwoHanded&& player.EItems.RightHand!=null)
+            {
+                player.EItems.HasTwoHanded = false;
+                player.Inventory.Add(player.EItems.RightHand);
+                player.EItems.RightHand = this;
+                Draw.EraseEq();
+                Draw.DrawEq(player);
+            }
+
         }
     }
 }
