@@ -33,7 +33,7 @@ namespace OODGame.Player
             InventoryLimit = lim;
         }
     }
-    public class EquipedItems
+    public class EquippedItems
     {
         public bool HasTwoHanded { get; set; }
         public Weapon? RightHand { get; set; }
@@ -52,6 +52,7 @@ namespace OODGame.Player
         public int Experience { get; set; }
         public int SkillPoints { get; set; }
         public Attributes Stats { get; private set; }
+        EquippedItems EArmor { get; set; }
         public string Name { get; }
         public List<Item> Inventory { get; set; } //for later
         public char Symbol { get; } = '¶';
@@ -68,6 +69,24 @@ namespace OODGame.Player
         public void Pickup(Item item) {
             Inventory.Add(item);
         }
+        public void OpenInventory()
+        {
+            int i=0; var size = Inventory.Count;
+            Draw.DrawItems(Inventory);
+            Draw.DrawItem(Inventory[i]);
+            while (true)
+            {
+                var key = Console.ReadKey(true).Key;
 
+                switch (key)
+                {
+                    case ConsoleKey.Escape: Draw.EraseItems(); Draw.EraseItem(); return;
+                    case ConsoleKey.LeftArrow: if (i > 0) i--; Draw.EraseItem(); Draw.DrawItem(Inventory[i]); break;
+                    case ConsoleKey.RightArrow: if (i < size-1) i++; Draw.EraseItem(); Draw.DrawItem(Inventory[i]); break;
+                    case ConsoleKey.E: if (Inventory[i].CanEquip(this)) Inventory[i].Equip(this); Inventory.RemoveAt(i); break;
+                    default: break;
+                }
+            }
+        }
     }
 }

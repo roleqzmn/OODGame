@@ -49,7 +49,8 @@ namespace OODGame
                 case ConsoleKey.S: newY++; break;
                 case ConsoleKey.A: newX--; break;
                 case ConsoleKey.D: newX++; break;
-                case ConsoleKey.E: if (tile.CanInteract()) tile.Interact(); break;
+                case ConsoleKey.E: if (tile.CanInteract()) tile.Interact(Player); return;
+                case ConsoleKey.I: Player.OpenInventory(); return;
                 case ConsoleKey.Escape: IsRunning = false; return;  
             }
 
@@ -130,7 +131,20 @@ namespace OODGame
         }
         public static void DrawItems(List<Item> items)
         {
+            throw new NotImplementedException();
+        }
+        public static void EraseItems()
+        {
+            throw new NotImplementedException();
+        }
+        public static void DrawItem(Item item) 
+        {
+            throw new NotImplementedException();
+        }
 
+        public static void EraseItem() 
+        {
+            throw new NotImplementedException();
         }
     }
 }

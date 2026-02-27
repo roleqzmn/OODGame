@@ -16,6 +16,7 @@ namespace OODGame.Items
         public Int16 Weight { get; set; }
         public abstract void OnPickedUp(Player.Player player);
         public abstract bool CanEquip(Player.Player player);
+        public abstract void Equip(Player.Player player);
         public Item(){
             Name=String.Empty; Description=String.Empty;
         }
@@ -32,5 +33,6 @@ namespace OODGame.Items
     public abstract class Armor : Item
     {
         public Int16 ArmorPoints {  get; set; }
+
     }
 }
