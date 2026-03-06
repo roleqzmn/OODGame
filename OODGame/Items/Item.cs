@@ -18,7 +18,7 @@ namespace OODGame.Items
         public abstract bool CanEquip(Player player);
         public abstract void Equip(Player player);
         public Item(){
-            Name=String.Empty; Description=String.Empty;
+            Name=string.Empty; Description=string.Empty;
         }
     }
     public abstract class Weapon : Item

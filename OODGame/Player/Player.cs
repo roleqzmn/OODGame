@@ -82,23 +82,25 @@ namespace OODGame.Players
                 switch (key)
                 {
                     case ConsoleKey.Escape: 
-                        Draw.EraseItems(); Draw.EraseItem();
+                        Draw.EraseItems(Inventory); Draw.EraseItem();
                         return;
                     case ConsoleKey.LeftArrow: 
                         if (i > 0) 
                             i--; 
-                        Draw.EraseItem(); Draw.DrawItem(Inventory[i]); 
+                        Draw.EraseItem(); if (size > 0) Draw.DrawItem(Inventory[i]); 
                         break;
                     case ConsoleKey.RightArrow: 
                         if (i < size-1) 
                             i++; 
-                        Draw.EraseItem(); Draw.DrawItem(Inventory[i]); 
+                        Draw.EraseItem(); if (size > 0) Draw.DrawItem(Inventory[i]); 
                         break;
                     case ConsoleKey.E: 
                         if (Inventory[i].CanEquip(this)) 
                         {
                             Inventory[i].Equip(this); 
-                            Inventory.RemoveAt(i); 
+                            Inventory.RemoveAt(i);
+                            if (i > 0) i--;
+                            if (size > 0) Draw.DrawItemInv(Inventory[i]);
                         } 
                         break;
                     default: break;

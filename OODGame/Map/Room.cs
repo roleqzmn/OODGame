@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OODGame.Items;
+using OODGame.Items.Weapons;
 
 namespace OODGame.Map
 {
@@ -23,13 +25,13 @@ namespace OODGame.Map
             string[] mapTemplate = new string[]
             {
             "  ######################################",
-            "                                       #",
+            "                                    C  #",
             "#    ########               ######     #",
             "#    ########               #    #     #",
             "#                           #    #     #",
             "#                           #    #     #",
             "#                           ######     #",
-            "#                                      #",
+            "#         U                            #",
             "#                                      #",
             "######################         #########",
             "#                                      #",
@@ -40,7 +42,7 @@ namespace OODGame.Map
             "#           #            #             #",
             "#  ######   ##############             #",
             "#       #                              #",
-            "#       #                              #",
+            "#     A #                            S #",
             "########################################"
             };
 
@@ -57,7 +59,45 @@ namespace OODGame.Map
                     else
                     {
                         Grid[y, x] = new EmptyTile();
+                        PlaceItem(templateChar, x, y);
                     }
+                }
+            }
+        }
+
+        private void PlaceItem(char symbol, int x, int y)
+        {
+            Item item = null;
+
+            switch (symbol)
+            {
+                case 'A':
+                    item = new TwoHandedAxe();
+                    break;
+                case 'S':
+                    item = new Sword();
+                    break;
+                case 'C':
+                    item = new Crossbow();
+                    break;
+                case 'U':
+                    //placeholder
+                    break;
+                default:
+                    return;
+            }
+
+            if (item != null)
+            {
+                var itemTile = Grid[y, x] as ItemTile;
+                if (itemTile == null)
+                {
+                    itemTile = new ItemTile(new List<Item> { item });
+                    Grid[y, x] = itemTile;
+                }
+                else
+                {
+                    itemTile.Items.Add(item);
                 }
             }
         }

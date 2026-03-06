@@ -10,7 +10,7 @@ namespace OODGame.Items.Weapons
 {
     internal class Sword : Weapon
     {
-        public override bool IsTwoHanded => true;
+        public override bool IsTwoHanded => false;
 
         public Sword()
         {
@@ -18,9 +18,9 @@ namespace OODGame.Items.Weapons
             AttackRate = 2;
             MinLvl = 0;
             Range = 1;
-            Symbol = 'A';
-            Description = "Needs two hands";
-            Name = "Two-handed Axe";
+            Symbol = 'S';
+            Description = "A steel sword";
+            Name = "Sword";
         }
 
         public override void OnPickedUp(Player player)

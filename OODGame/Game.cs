@@ -131,27 +131,73 @@ namespace OODGame
         }
         public static void DrawItems(List<Item> items)
         {
-            throw new NotImplementedException();
+            Console.SetCursorPosition(45, 11);
+            foreach(var item in items)
+            {
+                Console.Write($"{item.Symbol}, ");
+            }
         }
-        public static void EraseItems()
+        public static void EraseItems(List<Item> items)
         {
-            throw new NotImplementedException();
+            Console.SetCursorPosition(45, 11);
+            Console.Write($"   ");
+            foreach (var item in items)
+            {
+                Console.Write($"   ");
+            }
         }
-        public static void DrawItem(Item item) 
+        public static void DrawItem(Item item)
         {
-            throw new NotImplementedException();
+            Console.SetCursorPosition(45, 13);
+            Console.Write($"{item.Symbol}-{item.Name}");
+
+            Console.SetCursorPosition(45, 14);
+            Console.Write(item.Description);
+
+            Console.SetCursorPosition(45, 15);
+            Console.Write("Press E to pick up.");
         }
         public static void EraseItem() 
         {
-            throw new NotImplementedException();
+            Console.SetCursorPosition(45, 13);
+            Console.Write("                                    ");
+
+            Console.SetCursorPosition(45, 14);
+            Console.Write("                                    ");
+
+            Console.SetCursorPosition(45, 15);
+            Console.Write("                                    ");
+        }
+
+        public static void DrawItemInv(Item item)
+        {
+            Console.SetCursorPosition(45, 13);
+            Console.Write($"{item.Symbol}-{item.Name}");
+
+            Console.SetCursorPosition(45, 14);
+            Console.Write(item.Description);
+
+            Console.SetCursorPosition(45, 15);
+            Console.Write("Press E to equip.");
         }
         public static void DrawEq(Player player)
         {
-            throw new NotImplementedException();
+            Console.SetCursorPosition(45, 11);
+            if (player.EItems.LeftHand != null) Console.Write($"Left Hand: {player.EItems.LeftHand}, Damage:{player.EItems.LeftHand.Damage},  Attack Speed:{player.EItems.LeftHand.AttackRate} , Range:{player.EItems.LeftHand.Range}");
+            else Console.Write("Left Hand: none");
+            Console.SetCursorPosition(45, 11);
+            if (player.EItems.RightHand != null) Console.Write($"Right Hand: {player.EItems.RightHand}, Damage:{player.EItems.RightHand.Damage},  Attack Speed:{player.EItems.RightHand.AttackRate} , Range:{player.EItems.RightHand.Range}");
+            else Console.Write("Right Hand: none");
+
+
         }
         public static void EraseEq()
         {
-            throw new NotImplementedException();
+            for(int i = 11; i<20; i++)
+            {
+                Console.SetCursorPosition(45, i);
+                Console.Write("                                                                                                     ");
+            }
         }
 
     }

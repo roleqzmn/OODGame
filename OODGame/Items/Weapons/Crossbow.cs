@@ -17,9 +17,9 @@ namespace OODGame.Items.Weapons
             Damage = 25;
             MinLvl = 0;
             Range = 3;
-            Symbol = 'A';
-            Description = "Needs two hands";
-            Name = "Two-handed Axe";
+            Symbol = 'C';
+            Description = "Long-range weapon";
+            Name = "Crossbow";
         }
 
         public override void OnPickedUp(Player player)
@@ -38,7 +38,7 @@ namespace OODGame.Items.Weapons
         }
         public override void Equip(Player player)
         {
-            if(player.EItems.HasTwoHanded&& player.EItems.RightHand!=null)
+            if(player.EItems.HasTwoHanded && player.EItems.RightHand!=null)
             {
                 player.EItems.HasTwoHanded = false;
                 player.Inventory.Add(player.EItems.RightHand);
@@ -46,7 +46,10 @@ namespace OODGame.Items.Weapons
                 Draw.EraseEq();
                 Draw.DrawEq(player);
             }
-
+            else
+            {
+                
+            }
         }
     }
 }
