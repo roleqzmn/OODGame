@@ -74,7 +74,7 @@ namespace OODGame.Players
         {
             int i=0, size = Inventory.Count;
             Draw.DrawItems(Inventory);
-            Draw.DrawItem(Inventory[i]);
+            Draw.DrawItemInv(Inventory[i]);
             while (true)
             {
                 var key = Console.ReadKey(true).Key;
@@ -87,20 +87,25 @@ namespace OODGame.Players
                     case ConsoleKey.LeftArrow: 
                         if (i > 0) 
                             i--; 
-                        Draw.EraseItem(); if (size > 0) Draw.DrawItem(Inventory[i]); 
+                        Draw.EraseItem(); if (size > 0) Draw.DrawItemInv(Inventory[i]); 
                         break;
                     case ConsoleKey.RightArrow: 
                         if (i < size-1) 
                             i++; 
-                        Draw.EraseItem(); if (size > 0) Draw.DrawItem(Inventory[i]); 
+                        Draw.EraseItem(); if (size > 0) Draw.DrawItemInv(Inventory[i]); 
                         break;
                     case ConsoleKey.E: 
                         if (Inventory[i].CanEquip(this)) 
                         {
                             Inventory[i].Equip(this); 
                             Inventory.RemoveAt(i);
+                            Draw.EraseItem();
+                            Draw.EraseItems(Inventory);
+                            size=Inventory.Count;
+                            if (size < 1) return;
+                            Draw.DrawItems(Inventory);
                             if (i > 0) i--;
-                            if (size > 0) Draw.DrawItemInv(Inventory[i]);
+                            Draw.DrawItemInv(Inventory[i]);
                         } 
                         break;
                     default: break;

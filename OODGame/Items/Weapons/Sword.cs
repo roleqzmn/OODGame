@@ -34,7 +34,44 @@ namespace OODGame.Items.Weapons
         }
         public override void Equip(Player player)
         {
-            throw new NotImplementedException();
+            if (player.EItems.HasTwoHanded)
+            {
+                player.EItems.HasTwoHanded = false;
+                if (player.EItems.RightHand != null)
+                    player.Inventory.Add(player.EItems.RightHand);
+                player.EItems.RightHand = this;
+                Draw.EraseEq();
+                Draw.DrawEq(player);
+            }
+            else
+            {
+                Console.SetCursorPosition(70, 13);
+                Console.Write("Choose the slot: [L] Left hand, [R] Right Hand");
+                var choice = Console.ReadKey(true).KeyChar.ToString();
+
+                if (choice == "l")
+                {
+                    if (player.EItems.LeftHand != null)
+                    {
+                        player.Inventory.Add(player.EItems.LeftHand);
+                    }
+                    player.EItems.LeftHand = this;
+                    Draw.EraseEq();
+                    Draw.DrawEq(player);
+                }
+                else if (choice == "p")
+                {
+                    if (player.EItems.RightHand != null)
+                    {
+                        player.Inventory.Add(player.EItems.RightHand);
+                    }
+                    player.EItems.RightHand = this;
+                    Draw.EraseEq();
+                    Draw.DrawEq(player);
+                }
+                Console.SetCursorPosition(70, 13);
+                Console.Write("                                              ");
+            }
         }
         public override bool CanEquip(Player player)
         {

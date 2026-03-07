@@ -29,6 +29,7 @@ namespace OODGame
             Draw.DrawRoom(this);
             Draw.DrawPlayer(this);
             Draw.DrawUI(this);
+            Draw.DrawEq(Player);
 
             IsRunning = true;
             while (IsRunning)
@@ -86,6 +87,7 @@ namespace OODGame
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine("If you stand on Item tile, press [E] to interact\nPress [I] to open inventory.\nWalk wit [W][A][S][D]");
         }
         public static void DrawPlayer(Game game)
         {
@@ -182,21 +184,37 @@ namespace OODGame
         }
         public static void DrawEq(Player player)
         {
-            Console.SetCursorPosition(45, 11);
-            if (player.EItems.LeftHand != null) Console.Write($"Left Hand: {player.EItems.LeftHand}, Damage:{player.EItems.LeftHand.Damage},  Attack Speed:{player.EItems.LeftHand.AttackRate} , Range:{player.EItems.LeftHand.Range}");
+            Console.SetCursorPosition(70, 2);
+            if (player.EItems.LeftHand != null){ 
+                Console.Write($"Left Hand: {player.EItems.LeftHand.Name},");
+                Console.SetCursorPosition(75, 3);
+                Console.Write($"Damage:{player.EItems.LeftHand.Damage},");
+                Console.SetCursorPosition(75, 4);
+                Console.Write($"Attack Speed:{player.EItems.LeftHand.AttackRate},");
+                Console.SetCursorPosition(75, 5);
+                Console.Write($"Range:{player.EItems.LeftHand.Range}");
+            }
             else Console.Write("Left Hand: none");
-            Console.SetCursorPosition(45, 11);
-            if (player.EItems.RightHand != null) Console.Write($"Right Hand: {player.EItems.RightHand}, Damage:{player.EItems.RightHand.Damage},  Attack Speed:{player.EItems.RightHand.AttackRate} , Range:{player.EItems.RightHand.Range}");
+            Console.SetCursorPosition(70, 6);
+            if (player.EItems.RightHand != null)
+            {
+                Console.Write($"Right Hand: {player.EItems.RightHand.Name},");
+                Console.SetCursorPosition(70, 3);
+                Console.Write($"Damage:{player.EItems.RightHand.Damage},");
+                Console.SetCursorPosition(70, 4);
+                Console.Write($"Attack Speed:{player.EItems.RightHand.AttackRate},");
+                Console.SetCursorPosition(70, 5);
+                Console.Write($"Range:{player.EItems.RightHand.Range}");
+            }
             else Console.Write("Right Hand: none");
-
 
         }
         public static void EraseEq()
         {
-            for(int i = 11; i<20; i++)
+            for(int i = 2; i<20; i++)
             {
-                Console.SetCursorPosition(45, i);
-                Console.Write("                                                                                                     ");
+                Console.SetCursorPosition(70, i);
+                Console.Write("                     ");
             }
         }
 
