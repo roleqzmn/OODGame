@@ -51,13 +51,12 @@ namespace OODGame
                 case ConsoleKey.A: newX--; break;
                 case ConsoleKey.D: newX++; break;
                 case ConsoleKey.E: if (tile.CanInteract()) tile.Interact(Player); return;
-                case ConsoleKey.I: Player.OpenInventory(); return;
+                case ConsoleKey.I: Player.OpenInventory(tile); return;
                 case ConsoleKey.Escape: IsRunning = false; return;  
             }
 
             TryMove(newX, newY);
         }
-
         private void TryMove(int newX, int newY)
         {
             if (newX < 0 || newX >= CurrentRoom.Width || newY < 0 || newY >= CurrentRoom.Height) //will add moving to other rooms later
@@ -71,6 +70,19 @@ namespace OODGame
                 Player.Ypos = newY;
 
                 Draw.DrawPlayer(this);
+            }
+        }
+        public void DropItem(Item item, int x, int y)
+        {
+            var itemTile = CurrentRoom.Grid[y, x];
+            if (itemTile != null)
+            {
+                itemTile.PlaceItem(item);
+            }
+            else
+            {
+                itemTile = new EmptyTile();
+                itemTile.PlaceItem(item);
             }
         }
     }
@@ -194,16 +206,17 @@ namespace OODGame
                 Console.SetCursorPosition(75, 5);
                 Console.Write($"Range:{player.EItems.LeftHand.Range}");
             }
+            else if(player.EItems.HasTwoHanded) Console.Write("Two Handed");
             else Console.Write("Left Hand: none");
             Console.SetCursorPosition(70, 6);
             if (player.EItems.RightHand != null)
             {
                 Console.Write($"Right Hand: {player.EItems.RightHand.Name},");
-                Console.SetCursorPosition(70, 3);
+                Console.SetCursorPosition(75, 7);
                 Console.Write($"Damage:{player.EItems.RightHand.Damage},");
-                Console.SetCursorPosition(70, 4);
+                Console.SetCursorPosition(75, 8);
                 Console.Write($"Attack Speed:{player.EItems.RightHand.AttackRate},");
-                Console.SetCursorPosition(70, 5);
+                Console.SetCursorPosition(75, 9);
                 Console.Write($"Range:{player.EItems.RightHand.Range}");
             }
             else Console.Write("Right Hand: none");
@@ -214,7 +227,7 @@ namespace OODGame
             for(int i = 2; i<20; i++)
             {
                 Console.SetCursorPosition(70, i);
-                Console.Write("                     ");
+                Console.Write("                                 ");
             }
         }
 

@@ -38,7 +38,17 @@ namespace OODGame.Items.Weapons
         }
         public override void Equip(Player player)
         {
-            throw new NotImplementedException();
+            player.EItems.HasTwoHanded=true;
+
+            if (player.EItems.RightHand != null)
+                player.Pickup(player.EItems.RightHand);
+            if(player.EItems.LeftHand != null)
+                player.Pickup(player.EItems.LeftHand);
+
+            player.EItems.RightHand = this;
+            player.EItems.LeftHand = null;
+            Draw.EraseEq();
+            Draw.DrawEq(player);
         }
     }
 }

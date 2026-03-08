@@ -38,7 +38,7 @@ namespace OODGame.Items.Weapons
             {
                 player.EItems.HasTwoHanded = false;
                 if (player.EItems.RightHand != null)
-                    player.Inventory.Add(player.EItems.RightHand);
+                    player.Pickup(player.EItems.RightHand);
                 player.EItems.RightHand = this;
                 Draw.EraseEq();
                 Draw.DrawEq(player);
@@ -47,23 +47,23 @@ namespace OODGame.Items.Weapons
             {
                 Console.SetCursorPosition(70, 13);
                 Console.Write("Choose the slot: [L] Left hand, [R] Right Hand");
-                var choice = Console.ReadKey(true).KeyChar.ToString();
+                var choice = Console.ReadKey(true).KeyChar.ToString().ToUpper();
 
-                if (choice == "l")
+                if (choice == "L")
                 {
                     if (player.EItems.LeftHand != null)
                     {
-                        player.Inventory.Add(player.EItems.LeftHand);
+                        player.Pickup(player.EItems.LeftHand);
                     }
                     player.EItems.LeftHand = this;
                     Draw.EraseEq();
                     Draw.DrawEq(player);
                 }
-                else if (choice == "p")
+                else if (choice == "R")
                 {
                     if (player.EItems.RightHand != null)
                     {
-                        player.Inventory.Add(player.EItems.RightHand);
+                        player.Pickup(player.EItems.RightHand);
                     }
                     player.EItems.RightHand = this;
                     Draw.EraseEq();

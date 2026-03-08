@@ -1,10 +1,11 @@
-﻿using System;
+﻿using OODGame.Items;
+using OODGame.Items.Unequipable;
+using OODGame.Items.Weapons;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OODGame.Items;
-using OODGame.Items.Weapons;
 
 namespace OODGame.Map
 {
@@ -81,7 +82,7 @@ namespace OODGame.Map
                     item = new Crossbow();
                     break;
                 case 'U':
-                    //placeholder
+                    item = new Unusable1();
                     break;
                 default:
                     return;
@@ -89,16 +90,10 @@ namespace OODGame.Map
 
             if (item != null)
             {
-                var itemTile = Grid[y, x] as ItemTile;
-                if (itemTile == null)
-                {
-                    itemTile = new ItemTile(new List<Item> { item });
-                    Grid[y, x] = itemTile;
-                }
-                else
-                {
-                    itemTile.Items.Add(item);
-                }
+                var itemTile = Grid[y, x];
+                itemTile.PlaceItem(item); 
+                itemTile.PlaceItem(new Unusable1());
+                itemTile.PlaceItem(new Unusable3());
             }
         }
     }

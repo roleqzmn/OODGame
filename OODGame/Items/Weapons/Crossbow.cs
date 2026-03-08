@@ -14,8 +14,9 @@ namespace OODGame.Items.Weapons
 
         public Crossbow()
         {
-            Damage = 25;
+            Damage = 8;
             MinLvl = 0;
+            AttackRate = 3;
             Range = 3;
             Symbol = 'C';
             Description = "Long-range weapon";
@@ -57,7 +58,7 @@ namespace OODGame.Items.Weapons
                 {
                     if(player.EItems.LeftHand != null)
                     {
-                        player.Inventory.Add(player.EItems.LeftHand);
+                        player.Pickup(player.EItems.LeftHand);
                     }
                     player.EItems.LeftHand = this;
                     Draw.EraseEq();
@@ -67,7 +68,7 @@ namespace OODGame.Items.Weapons
                 {
                     if(player.EItems.RightHand != null)
                     {
-                        player.Inventory.Add(player.EItems.RightHand);
+                        player.Pickup(player.EItems.RightHand);
                     }
                     player.EItems.RightHand = this;
                     Draw.EraseEq();

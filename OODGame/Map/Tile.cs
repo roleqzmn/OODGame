@@ -13,15 +13,11 @@ namespace OODGame.Map
         public abstract bool CanEnter();
         public abstract void Interact(Player player);
         public abstract bool CanInteract();
+        public abstract void PlaceItem(Item item);
+        public abstract bool CanPlace();
     }
 
-    public class EmptyTile : Tile
-    {
-        public EmptyTile() { Symbol = ' '; }
-        public override bool CanEnter() => true;
-        public override void Interact(Player player) { }
-        public override bool CanInteract() => false;
-    }
+   
 
     public class WallTile : Tile
     {
@@ -29,19 +25,25 @@ namespace OODGame.Map
         public override bool CanEnter() => false;
         public override void Interact(Player player) { }
         public override bool CanInteract() => false;
+        public override void PlaceItem(Item item) { }
+        public override bool CanPlace() => false;
     }
 
-    public class ItemTile : Tile
+    public class EmptyTile : Tile
     {
         public List<Item> Items { get; protected set; }
-        public ItemTile(List<Item>? items) { 
-            if (items != null) 
+        public EmptyTile(List<Item>? items) { 
+            if (Items != null) 
                 Items = items;
             else 
                 Items = new List<Item>();
             UpdateSymbol(); 
         }
-
+        public EmptyTile()
+        {
+            Items = new List<Item>();
+            UpdateSymbol();
+        }
         private void UpdateSymbol()
         {
             Symbol = Items.Count > 0 ? 'I' : ' ';
@@ -110,29 +112,37 @@ namespace OODGame.Map
                 }
             }
         }
-        public override bool CanInteract() => true;
+        public override bool CanInteract() => Items.Count>0;
+        public override void PlaceItem(Item item)
+        {
+            Items.Add(item);
+            UpdateSymbol();
+        }
+        public override bool CanPlace() => true;
     }
 
     public class ChestTile : Tile
     {
+        public List<Item> Items { get; protected set; }
+        public ChestTile() { Items = new List<Item>(); }
         public override bool CanEnter() => true;
         public override void Interact(Player player)
         {
-            List<Item> items = GenerateItems();
-            if (items.Count == 0)
+            Items = GenerateItems();
+            if (Items.Count == 0)
                 return;
 
-            Draw.DrawItems(items);
+            Draw.DrawItems(Items);
             int i = 0;
-            Draw.DrawItem(items[i]);
+            Draw.DrawItem(Items[i]);
 
             while (true)
             {
                 var key = Console.ReadKey(true).Key;
                 switch (key)
                 {
-                    case ConsoleKey.Q:
-                        Draw.EraseItems(items);
+                    case ConsoleKey.Escape:
+                        Draw.EraseItems(Items);
                         Draw.EraseItem();
                         return;
 
@@ -140,36 +150,36 @@ namespace OODGame.Map
                         if (i > 0)
                             i--;
                         Draw.EraseItem();
-                        Draw.DrawItem(items[i]);
+                        Draw.DrawItem(Items[i]);
                         break;
 
                     case ConsoleKey.RightArrow:
-                        if (i < items.Count - 1)
+                        if (i < Items.Count - 1)
                             i++;
                         Draw.EraseItem();
-                        Draw.DrawItem(items[i]);
+                        Draw.DrawItem(Items[i]);
                         break;
 
                     case ConsoleKey.E:
-                        if (player.CanPickup(items[i]))
+                        if (player.CanPickup(Items[i]))
                         {
-                            player.Pickup(items[i]);
-                            items.RemoveAt(i);
+                            player.Pickup(Items[i]);
+                            Items.RemoveAt(i);
 
-                            if (items.Count == 0)
+                            if (Items.Count == 0)
                             {
-                                Draw.EraseItems(items);
+                                Draw.EraseItems(Items);
                                 Draw.EraseItem();
                                 return;
                             }
 
-                            if (i >= items.Count)
-                                i = items.Count - 1;
+                            if (i >= Items.Count)
+                                i = Items.Count - 1;
 
-                            Draw.EraseItems(items);
+                            Draw.EraseItems(Items);
                             Draw.EraseItem();
-                            Draw.DrawItems(items);
-                            Draw.DrawItem(items[i]);
+                            Draw.DrawItems(Items);
+                            Draw.DrawItem(Items[i]);
                         }
                         break;
 
@@ -183,5 +193,10 @@ namespace OODGame.Map
         {
             return new List<Item>();
         }
+        public override void PlaceItem(Item item)
+        {
+            Items.Add(item);
+        }
+        public override bool CanPlace() => true;
     }
 }

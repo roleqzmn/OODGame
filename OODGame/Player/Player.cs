@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OODGame.Items;
+using OODGame.Map;
 
 namespace OODGame.Players
 {
@@ -70,7 +71,7 @@ namespace OODGame.Players
         public void Pickup(Item item) {
             Inventory.Add(item);
         }
-        public void OpenInventory()
+        public void OpenInventory(Tile tile)
         {
             int i=0, size = Inventory.Count;
             Draw.DrawItems(Inventory);
@@ -107,6 +108,20 @@ namespace OODGame.Players
                             if (i > 0) i--;
                             Draw.DrawItemInv(Inventory[i]);
                         } 
+                        break;
+                    case ConsoleKey.Q: 
+                        if (tile.CanPlace()) 
+                        { 
+                            tile.PlaceItem(Inventory[i]);
+                            Inventory.RemoveAt(i);
+                            size = Inventory.Count;
+                            Draw.EraseItem();
+                            Draw.EraseItems(Inventory);
+                            if (size < 1) return;
+                            Draw.DrawItems(Inventory);
+                            if (i > 0) i--;
+                            Draw.DrawItemInv(Inventory[i]);
+                        }
                         break;
                     default: break;
                 }
