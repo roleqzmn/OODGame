@@ -18,6 +18,7 @@ namespace OODGame.Items.Weapons
             MinLvl = 0;
             AttackRate = 3;
             Range = 3;
+            Weight = 1;
             Symbol = 'C';
             Description = "Long-range weapon";
             Name = "Crossbow";
@@ -33,10 +34,7 @@ namespace OODGame.Items.Weapons
             throw new NotImplementedException();
         }
 
-        public override bool CanEquip(Player player)
-        {
-            return player.Level >= MinLvl;
-        }
+        public override bool CanEquip(Player player) => player.Level >= MinLvl;
         public override void Equip(Player player)
         {
             if(player.EItems.HasTwoHanded)

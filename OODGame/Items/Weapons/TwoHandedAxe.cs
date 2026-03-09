@@ -17,6 +17,7 @@ namespace OODGame.Items.Weapons
             MinLvl = 0;
             AttackRate = 1;
             Range = 1;
+            Weight = 2;
             Symbol = 'A';
             Description = "Needs two hands";
             Name = "Two-handed Axe";
@@ -32,10 +33,7 @@ namespace OODGame.Items.Weapons
             throw new NotImplementedException();
         }
 
-        public override bool CanEquip(Player player)
-        {
-            return player.Level >= MinLvl;
-        }
+        public override bool CanEquip(Player player) => player.Level >= MinLvl;
         public override void Equip(Player player)
         {
             player.EItems.HasTwoHanded=true;

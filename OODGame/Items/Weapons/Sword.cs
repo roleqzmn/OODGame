@@ -18,6 +18,7 @@ namespace OODGame.Items.Weapons
             AttackRate = 2;
             MinLvl = 0;
             Range = 1;
+            Weight = 1;
             Symbol = 'S';
             Description = "A steel sword";
             Name = "Sword";
@@ -73,9 +74,6 @@ namespace OODGame.Items.Weapons
                 Console.Write("                                              ");
             }
         }
-        public override bool CanEquip(Player player)
-        {
-            return player.Level >= MinLvl;
-        }
+        public override bool CanEquip(Player player) => player.Level >= MinLvl;
     }
 }

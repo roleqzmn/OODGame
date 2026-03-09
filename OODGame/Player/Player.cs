@@ -65,11 +65,10 @@ namespace OODGame.Players
             Stats = new Attributes(10, 10, 100, 5, 2, 5, 20);
             EItems = new EquippedItems();
         }
-        public bool CanPickup(Item item){
-            return (item.Weight + Stats.CurrentLoad < Stats.InventoryLimit);
-        }
+        public bool CanPickup(Item item) => (item.Weight + Stats.CurrentLoad < Stats.InventoryLimit);
         public void Pickup(Item item) {
             Inventory.Add(item);
+            Stats.CurrentLoad += item.Weight;
         }
         public void OpenInventory(Tile tile)
         {
@@ -113,6 +112,7 @@ namespace OODGame.Players
                         if (tile.CanPlace()) 
                         { 
                             tile.PlaceItem(Inventory[i]);
+                            Stats.CurrentLoad -= Inventory[i].Weight;
                             Inventory.RemoveAt(i);
                             size = Inventory.Count;
                             Draw.EraseItem();
