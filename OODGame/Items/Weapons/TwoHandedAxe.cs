@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using OODGame.Players;
 namespace OODGame.Items.Weapons
 {
-    internal class TwoHandedAxe : Weapon
+    internal class TwoHandedAxe : TwoHandedWeapon
     {   
         public override bool IsTwoHanded => true;
 
@@ -28,25 +28,12 @@ namespace OODGame.Items.Weapons
             if (player.CanPickup(this))
                 player.Pickup(this);
         }
-        public override void Attack(Player player, IEnemy enemy)
+        public override void Attack(Player player, Enemy enemy)
         {
             throw new NotImplementedException();
         }
 
         public override bool CanEquip(Player player) => player.Level >= MinLvl;
-        public override void Equip(Player player)
-        {
-            player.EItems.HasTwoHanded=true;
-
-            if (player.EItems.RightHand != null)
-                player.Pickup(player.EItems.RightHand);
-            if(player.EItems.LeftHand != null)
-                player.Pickup(player.EItems.LeftHand);
-
-            player.EItems.RightHand = this;
-            player.EItems.LeftHand = null;
-            Draw.EraseEq();
-            Draw.DrawEq(player);
-        }
+        
     }
 }

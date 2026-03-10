@@ -16,9 +16,6 @@ namespace OODGame.Map
         public abstract void PlaceItem(Item item);
         public abstract bool CanPlace();
     }
-
-   
-
     public class WallTile : Tile
     {
         public WallTile() { Symbol = '█'; }

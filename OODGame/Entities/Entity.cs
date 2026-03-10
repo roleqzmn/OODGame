@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace OODGame.Entities
 {
-    public interface IEntity
+    public abstract class Entity
     {
         public string Name { get; }
-        
+        public Entity() { Name=string.Empty;}
     }
-    public interface IEnemy : IEntity
+    public abstract class Enemy : Entity
     {
         public int Armor { get; }
         public int Damage { get; } 

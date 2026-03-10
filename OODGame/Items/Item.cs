@@ -21,15 +21,6 @@ namespace OODGame.Items
             Name=string.Empty; Description=string.Empty;
         }
     }
-    public abstract class Weapon : Item
-    {
-        public Int16 Damage { get; set; }
-        public Int16 MinLvl { get; set; }
-        public Int16 AttackRate { get; set; }
-        public Int16 Range { get; set; }
-        public abstract bool IsTwoHanded { get; }
-        public abstract void Attack(Player player, IEnemy enemy);
-    }
     public abstract class Armor : Item
     {
         public Int16 ArmorPoints {  get; set; }
