@@ -1,9 +1,13 @@
 ﻿using OODGame.Items;
+using OODGame.Items.Unequipable;
+using OODGame.Items.Weapons;
 using OODGame.Map;
 using OODGame.Players;
+using OODGame.Actions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,15 +16,73 @@ namespace OODGame
     public class Game
     {
         public Room CurrentRoom { get; set; }
-        public Room[,] Map { get; set; } //placeholder for later
+        public Room[,] Map { get; set; }
         public Player Player { get; set; }
-        bool IsRunning { get; set; }
+        public int CurrentMapX { get; set; }
+        public int CurrentMapY { get; set; }
+        public bool IsRunning { get; set; }
+        
+        public const int RoomWidth = 40;
+        public const int RoomHeight = 20;
+        private Random _roomRandom = new Random();
+        private Actions.Actions actions {  get; set; }
+
         public Game()
         {
-            CurrentRoom = new Room();
-            Player = new Player();
-            Map = new Room[1, 1]; //placeholder for generation
+            var items = new List<Item>
+            {
+                new Unusable1(),
+                new Unusable2(),
+                new Unusable3()
+            };
+            var weapons = new List<Weapon>
+            {
+                new Sword(),
+                new Crossbow(),
+                new TwoHandedAxe()
+            };
+            Map = new Room[3, 3];
+            CurrentMapX = 1;
+            CurrentMapY = 1;
+            for (int y = 0; y < 3; y++)
+            {
+                for (int x = 0; x < 3; x++)
+                {
+                    Map[y, x] = GenerateConnectedRoom(x, y, items, weapons);
+                }
+            }
+
+            CurrentRoom = Map[CurrentMapY, CurrentMapX];
+            Player = new Player(RoomWidth / 2, RoomHeight / 2);
+            actions = new Actions.Actions(this); 
         }
+
+        private Room GenerateConnectedRoom(int mapX, int mapY, List<Item> items, List<Weapon> weapons)
+        {
+            int centralRoomWidth = _roomRandom.Next(12, 18);
+            int centralRoomHeight = _roomRandom.Next(10, 14);
+            int pathCount = _roomRandom.Next(3, 7);
+            int pathLength = _roomRandom.Next(80, 150);
+            int chamberCount = _roomRandom.Next(4, 10);
+            int chamberMinSize = _roomRandom.Next(3, 5);
+            int chamberMaxSize = _roomRandom.Next(6, 10);
+            int itemCount = _roomRandom.Next(6, 15);
+            int weaponCount = _roomRandom.Next(3, 8);
+
+            var builder = new DungeonBuilder(RoomWidth, RoomHeight)
+                .CreateFilled()
+                .AddCentralRoom(centralRoomWidth, centralRoomHeight)
+                .AddPaths(pathCount, pathLength)
+                .AddChambers(chamberCount, chamberMinSize, chamberMaxSize)
+                .AddItems(items, itemCount)
+                .AddWeapons(weapons, weaponCount)
+                .EnsurePassagesConnected(mapX, mapY, 3, 3);
+
+            var room = builder.Build();
+
+            return room;
+        }
+
         public void Run()
         {
             Console.CursorVisible = false;
@@ -40,38 +102,17 @@ namespace OODGame
         private void HandleInput()
         {
             var key = Console.ReadKey(true).Key;
-
-            int newX = Player.Xpos;
-            int newY = Player.Ypos;
-            Tile tile = CurrentRoom.Grid[Player.Ypos, Player.Xpos];
-            switch (key)
+            if (actions.actions.TryGetValue(key, out var action))
             {
-                case ConsoleKey.W: newY--; break;
-                case ConsoleKey.S: newY++; break;
-                case ConsoleKey.A: newX--; break;
-                case ConsoleKey.D: newX++; break;
-                case ConsoleKey.E: if (tile.CanInteract()) tile.Interact(Player); return;
-                case ConsoleKey.I: Player.OpenInventory(tile); return;
-                case ConsoleKey.Escape: IsRunning = false; return;  
+                action.Invoke();
             }
-
-            TryMove(newX, newY);
-        }
-        private void TryMove(int newX, int newY)
-        {
-            if (newX < 0 || newX >= CurrentRoom.Width || newY < 0 || newY >= CurrentRoom.Height) //will add moving to other rooms later
-                return;
-
-            if (CurrentRoom.Grid[newY, newX].CanEnter())
+            else
             {
-                Draw.ErasePlayer(this);
 
-                Player.Xpos = newX;
-                Player.Ypos = newY;
-
-                Draw.DrawPlayer(this);
             }
         }
+
+      
         public void DropItem(Item item, int x, int y)
         {
             var itemTile = CurrentRoom.Grid[y, x];
@@ -99,7 +140,7 @@ namespace OODGame
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine("If you stand on Item tile, press [E] to interact\nPress [I] to open inventory.\nWalk wit [W][A][S][D]");
+            Console.WriteLine("If you stand on Item tile, press [E] to interact\nPress [I] to open inventory.\nWalk with [W][A][S][D].\nUse arrows to navigate in inventory");
         }
         public static void DrawPlayer(Game game)
         {
@@ -230,6 +271,15 @@ namespace OODGame
                 Console.Write("                                 ");
             }
         }
-
+        public static void DrawHandChoice()
+        {
+            Console.SetCursorPosition(70, 13);
+            Console.Write("Choose the slot: [L] Left hand, [R] Right Hand");
+        }
+        public static void EraseHandChoice()
+        {
+            Console.SetCursorPosition(70, 13);
+            Console.Write("                                              ");
+        }
     }
 }

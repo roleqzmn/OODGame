@@ -12,59 +12,60 @@ namespace OODGame.Map
     public class Room
     {
         public Tile[,] Grid { get; private set; }
-        public readonly int Width = 40;
-        public readonly int Height = 20;
+        public readonly int Width;
+        public readonly int Height;
 
-        public Room()
+        public Room(int width, int height, Tile[,] grid)
         {
-            Grid = new Tile[Height, Width];
-            InitializeMap();
+            Width = width;
+            Height = height;
+            Grid = grid;
         }
 
-        private void InitializeMap()
-        {
-            string[] mapTemplate = new string[]
-            {
-            "  ######################################",
-            "                                    C  #",
-            "#    ########               ######     #",
-            "#    ########               #    #     #",
-            "#                           #    #     #",
-            "#                           #    #     #",
-            "#                           ######     #",
-            "#         U                            #",
-            "#                                      #",
-            "######################         #########",
-            "#                                      #",
-            "#                                      #",
-            "#           ##############             #",
-            "#           #            #             #",
-            "#           #            #             #",
-            "#           #            #             #",
-            "#  ######   ##############             #",
-            "#       #                              #",
-            "#     A #                            S #",
-            "########################################"
-            };
+        //private void InitializeMap()
+        //{
+        //    string[] mapTemplate = new string[]
+        //    {
+        //    "  ######################################",
+        //    "                                    C  #",
+        //    "#    ########               ######     #",
+        //    "#    ########               #    #     #",
+        //    "#                           #    #     #",
+        //    "#                           #    #     #",
+        //    "#                           ######     #",
+        //    "#         U                            #",
+        //    "#                                      #",
+        //    "######################         #########",
+        //    "#                                      #",
+        //    "#                                      #",
+        //    "#           ##############             #",
+        //    "#           #            #             #",
+        //    "#           #            #             #",
+        //    "#           #            #             #",
+        //    "#  ######   ##############             #",
+        //    "#       #                              #",
+        //    "#     A #                            S #",
+        //    "########################################"
+        //    };
 
-            for (int y = 0; y < Height; y++)
-            {
-                for (int x = 0; x < Width; x++)
-                {
-                    char templateChar = mapTemplate[y][x];
+        //    for (int y = 0; y < Height; y++)
+        //    {
+        //        for (int x = 0; x < Width; x++)
+        //        {
+        //            char templateChar = mapTemplate[y][x];
 
-                    if (templateChar == '#')
-                    {
-                        Grid[y, x] = new WallTile();
-                    }
-                    else
-                    {
-                        Grid[y, x] = new EmptyTile();
-                        PlaceItem(templateChar, x, y);
-                    }
-                }
-            }
-        }
+        //            if (templateChar == '#')
+        //            {
+        //                Grid[y, x] = new WallTile();
+        //            }
+        //            else
+        //            {
+        //                Grid[y, x] = new EmptyTile();
+        //                PlaceItem(templateChar, x, y);
+        //            }
+        //        }
+        //    }
+        //}
 
         private void PlaceItem(char symbol, int x, int y)
         {

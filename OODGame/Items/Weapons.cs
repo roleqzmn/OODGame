@@ -28,8 +28,7 @@ namespace OODGame.Items
                     player.Pickup(player.EItems.RightHand);
                 player.EItems.RightHand = null;
             }
-            Console.SetCursorPosition(70, 13);
-            Console.Write("Choose the slot: [L] Left hand, [R] Right Hand");
+            Draw.DrawHandChoice();
             var choice = Console.ReadKey(true).KeyChar.ToString().ToUpper();
 
             if (choice == "L")
@@ -52,8 +51,7 @@ namespace OODGame.Items
                 Draw.EraseEq();
                 Draw.DrawEq(player);
             }
-            Console.SetCursorPosition(70, 13);
-            Console.Write("                                              ");
+            Draw.EraseHandChoice();
         }
     }
     public abstract class TwoHandedWeapon : Weapon
