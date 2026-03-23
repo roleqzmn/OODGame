@@ -16,59 +16,17 @@ namespace OODGame.Items
         public Int16 Range { get; set; }
         public abstract bool IsTwoHanded { get; }
         public abstract void Attack(Player player, Enemy enemy);
+        public override void Equip(Player player)
+        {
+            player.EquipWeapon(this);
+        }
     }
     public abstract class OneHandedWeapon : Weapon
     {
-        public override void Equip(Player player)
-        {
-            if (player.EItems.HasTwoHanded)
-            {
-                player.EItems.HasTwoHanded = false;
-                if (player.EItems.RightHand != null)
-                    player.Pickup(player.EItems.RightHand);
-                player.EItems.RightHand = null;
-            }
-            Draw.DrawHandChoice();
-            var choice = Console.ReadKey(true).KeyChar.ToString().ToUpper();
-
-            if (choice == "L")
-            {
-                if (player.EItems.LeftHand != null)
-                {
-                    player.Pickup(player.EItems.LeftHand);
-                }
-                player.EItems.LeftHand = this;
-                Draw.EraseEq();
-                Draw.DrawEq(player);
-            }
-            else if (choice == "R")
-            {
-                if (player.EItems.RightHand != null)
-                {
-                    player.Pickup(player.EItems.RightHand);
-                }
-                player.EItems.RightHand = this;
-                Draw.EraseEq();
-                Draw.DrawEq(player);
-            }
-            Draw.EraseHandChoice();
-        }
+      
     }
     public abstract class TwoHandedWeapon : Weapon
     {
-        public override void Equip(Player player)
-        {
-            player.EItems.HasTwoHanded = true;
 
-            if (player.EItems.RightHand != null)
-                player.Pickup(player.EItems.RightHand);
-            if (player.EItems.LeftHand != null)
-                player.Pickup(player.EItems.LeftHand);
-
-            player.EItems.RightHand = this;
-            player.EItems.LeftHand = null;
-            Draw.EraseEq();
-            Draw.DrawEq(player);
-        }
     }
 }

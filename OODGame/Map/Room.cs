@@ -67,35 +67,35 @@ namespace OODGame.Map
         //    }
         //}
 
-        private void PlaceItem(char symbol, int x, int y)
-        {
-            Item item = null;
+        //private void PlaceItem(char symbol, int x, int y)
+        //{
+        //    Item item = null;
 
-            switch (symbol)
-            {
-                case 'A':
-                    item = new TwoHandedAxe();
-                    break;
-                case 'S':
-                    item = new Sword();
-                    break;
-                case 'C':
-                    item = new Crossbow();
-                    break;
-                case 'U':
-                    item = new Unusable1();
-                    break;
-                default:
-                    return;
-            }
+        //    switch (symbol)
+        //    {
+        //        case 'A':
+        //            item = new TwoHandedAxe();
+        //            break;
+        //        case 'S':
+        //            item = new Sword();
+        //            break;
+        //        case 'C':
+        //            item = new Crossbow();
+        //            break;
+        //        case 'U':
+        //            item = new Unusable1();
+        //            break;
+        //        default:
+        //            return;
+        //    }
 
-            if (item != null)
-            {
-                var itemTile = Grid[y, x];
-                itemTile.PlaceItem(item); 
-                itemTile.PlaceItem(new Unusable1());
-                itemTile.PlaceItem(new Unusable3());
-            }
-        }
+        //    if (item != null)
+        //    {
+        //        var itemTile = Grid[y, x];
+        //        itemTile.PlaceItem(item); 
+        //        itemTile.PlaceItem(new Unusable1());
+        //        itemTile.PlaceItem(new Unusable3());
+        //    }
+        //}
     }
 }

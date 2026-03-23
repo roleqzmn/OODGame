@@ -223,7 +223,10 @@ namespace OODGame
             Console.SetCursorPosition(45, 15);
             Console.Write("                                    ");
         }
+        public static void DrawInventory()
+        {
 
+        }
         public static void DrawItemInv(Item item)
         {
             Console.SetCursorPosition(45, 13);

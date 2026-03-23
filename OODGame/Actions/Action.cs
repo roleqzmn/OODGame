@@ -30,8 +30,7 @@ namespace OODGame.Actions
         private void InteractWithTile()
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
-            if (tile.CanInteract())
-                tile.Interact(Game.Player);
+            Game.Player.InteractWithTile(tile);
         }
 
         private void OpenPlayerInventory()

@@ -1,10 +1,11 @@
-﻿using System;
+﻿using OODGame.Items;
+using OODGame.Map;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using OODGame.Items;
-using OODGame.Map;
 
 namespace OODGame.Players
 {
@@ -125,6 +126,66 @@ namespace OODGame.Players
                         break;
                     default: break;
                 }
+            }
+        }
+
+        public void InteractWithTile(Tile tile)
+        {
+            if(tile.CanInteract())
+                tile.Interact(this);
+        }
+
+        public void EquipWeapon(Weapon item)
+        {
+            if(!item.CanEquip(this))
+                return;
+            if (!item.IsTwoHanded)
+            {
+                if (EItems.HasTwoHanded)
+                {
+                    EItems.HasTwoHanded = false;
+                    if (EItems.RightHand != null)
+                        Pickup(EItems.RightHand);
+                    EItems.RightHand = null;
+                }
+                Draw.DrawHandChoice();
+                var choice = Console.ReadKey(true).Key;
+
+                if (choice == ConsoleKey.L)
+                {
+                    if (EItems.LeftHand != null)
+                    {
+                        Pickup(EItems.LeftHand);
+                    }
+                    EItems.LeftHand = (Weapon)item;
+                    Draw.EraseEq();
+                    Draw.DrawEq(this);
+                }
+                else if (choice == ConsoleKey.R)
+                {
+                    if (EItems.RightHand != null)
+                    {
+                        Pickup(EItems.RightHand);
+                    }
+                    EItems.RightHand = (Weapon)item;
+                    Draw.EraseEq();
+                    Draw.DrawEq(this);
+                }
+                Draw.EraseHandChoice();
+            }
+            else
+            {
+                EItems.HasTwoHanded = true;
+
+                if (EItems.RightHand != null)
+                    Pickup(EItems.RightHand);
+                if (EItems.LeftHand != null)
+                    Pickup(EItems.LeftHand);
+
+                EItems.RightHand = item;
+                EItems.LeftHand = null;
+                Draw.EraseEq();
+                Draw.DrawEq(this);
             }
         }
     }
