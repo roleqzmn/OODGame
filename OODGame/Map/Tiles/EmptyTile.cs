@@ -45,7 +45,7 @@ namespace OODGame.Map
                 var key = Console.ReadKey(true).Key;
                 switch (key)
                 {
-                    case ConsoleKey.Q:
+                    case ConsoleKey.Escape:
                         Draw.EraseItems(Items);
                         Draw.EraseItem();
                         return;
