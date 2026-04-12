@@ -20,7 +20,7 @@ namespace OODGame.Items.Unequipable
                 player.Pickup(this);
         }
         public override bool CanEquip(Player player) => false;
-        public override void Equip(Player player) { }
+        public override bool Equip(Player player) => false;
 
     }
     public class Unusable2 : Item
@@ -37,7 +37,7 @@ namespace OODGame.Items.Unequipable
                 player.Pickup(this);
         }
         public override bool CanEquip(Player player) => false;
-        public override void Equip(Player player) { }
+        public override bool Equip(Player player) => false;
     }
     public class Unusable3 : Item
     {
@@ -53,6 +53,6 @@ namespace OODGame.Items.Unequipable
                 player.Pickup(this);
         }
         public override bool CanEquip(Player player) => false;
-        public override void Equip(Player player) { }
+        public override bool Equip(Player player) => false;
     }
 }

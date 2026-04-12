@@ -71,57 +71,66 @@ namespace OODGame.Players
             Inventory.Add(item);
             Stats.CurrentLoad += item.Weight;
         }
+        private void ReturnToInventory(Weapon item) {
+            Inventory.Add(item);
+        }
         public void OpenInventory(Tile tile)
         {
-            int i=0, size = Inventory.Count;
+            if (Inventory.Count == 0) return;
+            int i = 0;
             Draw.DrawItems(Inventory);
-            Draw.DrawItemInv(Inventory[i]);
+            Draw.DrawItemInv(Inventory[i], this);
             while (true)
             {
+                int size = Inventory.Count;
                 var key = Console.ReadKey(true).Key;
 
                 switch (key)
                 {
-                    case ConsoleKey.Escape: 
+                    case ConsoleKey.Escape:
                         Draw.EraseItems(Inventory); Draw.EraseItem();
                         return;
-                    case ConsoleKey.LeftArrow: 
-                        if (i > 0) 
-                            i--; 
-                        Draw.EraseItem(); if (size > 0) Draw.DrawItemInv(Inventory[i]); 
+                    case ConsoleKey.LeftArrow:
+                        if (i > 0) i--;
+                        Draw.EraseItem(); Draw.DrawItemInv(Inventory[i], this);
                         break;
-                    case ConsoleKey.RightArrow: 
-                        if (i < size-1) 
-                            i++; 
-                        Draw.EraseItem(); if (size > 0) Draw.DrawItemInv(Inventory[i]); 
+                    case ConsoleKey.RightArrow:
+                        if (i < size - 1) i++;
+                        Draw.EraseItem(); Draw.DrawItemInv(Inventory[i], this);
                         break;
-                    case ConsoleKey.E: 
-                        if (Inventory[i].CanEquip(this)) 
+                    case ConsoleKey.E:
+                        if (Inventory[i].CanEquip(this))
                         {
-                            Inventory[i].Equip(this); 
-                            Inventory.RemoveAt(i);
-                            Draw.EraseItem();
-                            Draw.EraseItems(Inventory);
-                            size=Inventory.Count;
-                            if (size < 1) return;
-                            Draw.DrawItems(Inventory);
-                            if (i > 0) i--;
-                            Draw.DrawItemInv(Inventory[i]);
-                        } 
+                            var itemToEquip = Inventory[i];
+                            Stats.CurrentLoad -= itemToEquip.Weight;
+                            if (itemToEquip.Equip(this))
+                            {
+                                Inventory.Remove(itemToEquip);
+                                if (Inventory.Count < 1) { Draw.EraseItem(); Draw.EraseItems(Inventory); return; }
+                                if (i >= Inventory.Count) i = Inventory.Count - 1;
+                                Draw.EraseItem();
+                                Draw.EraseItems(Inventory);
+                                Draw.DrawItems(Inventory);
+                                Draw.DrawItemInv(Inventory[i], this);
+                            }
+                            else
+                            {
+                                Stats.CurrentLoad += itemToEquip.Weight;
+                            }
+                        }
                         break;
-                    case ConsoleKey.Q: 
-                        if (tile.CanPlace()) 
-                        { 
+                    case ConsoleKey.Q:
+                        if (tile.CanPlace())
+                        {
                             tile.PlaceItem(Inventory[i]);
                             Stats.CurrentLoad -= Inventory[i].Weight;
                             Inventory.RemoveAt(i);
-                            size = Inventory.Count;
                             Draw.EraseItem();
                             Draw.EraseItems(Inventory);
-                            if (size < 1) return;
+                            if (Inventory.Count < 1) return;
+                            if (i >= Inventory.Count) i = Inventory.Count - 1;
                             Draw.DrawItems(Inventory);
-                            if (i > 0) i--;
-                            Draw.DrawItemInv(Inventory[i]);
+                            Draw.DrawItemInv(Inventory[i], this);
                         }
                         break;
                     default: break;
@@ -135,57 +144,57 @@ namespace OODGame.Players
                 tile.Interact(this);
         }
 
-        public void EquipWeapon(Weapon item)
+        public bool EquipWeapon(Weapon item)
         {
-            if(!item.CanEquip(this))
-                return;
+            if (!item.CanEquip(this))
+                return false;
             if (!item.IsTwoHanded)
             {
                 if (EItems.HasTwoHanded)
                 {
                     EItems.HasTwoHanded = false;
                     if (EItems.RightHand != null)
-                        Pickup(EItems.RightHand);
+                        ReturnToInventory(EItems.RightHand);
                     EItems.RightHand = null;
                 }
                 Draw.DrawHandChoice();
                 var choice = Console.ReadKey(true).Key;
+                Draw.EraseHandChoice();
 
                 if (choice == ConsoleKey.L)
                 {
                     if (EItems.LeftHand != null)
-                    {
-                        Pickup(EItems.LeftHand);
-                    }
+                        ReturnToInventory(EItems.LeftHand);
                     EItems.LeftHand = (Weapon)item;
                     Draw.EraseEq();
                     Draw.DrawEq(this);
+                    return true;
                 }
                 else if (choice == ConsoleKey.R)
                 {
                     if (EItems.RightHand != null)
-                    {
-                        Pickup(EItems.RightHand);
-                    }
+                        ReturnToInventory(EItems.RightHand);
                     EItems.RightHand = (Weapon)item;
                     Draw.EraseEq();
                     Draw.DrawEq(this);
+                    return true;
                 }
-                Draw.EraseHandChoice();
+                return false;
             }
             else
             {
                 EItems.HasTwoHanded = true;
 
                 if (EItems.RightHand != null)
-                    Pickup(EItems.RightHand);
+                    ReturnToInventory(EItems.RightHand);
                 if (EItems.LeftHand != null)
-                    Pickup(EItems.LeftHand);
+                    ReturnToInventory(EItems.LeftHand);
 
                 EItems.RightHand = item;
                 EItems.LeftHand = null;
                 Draw.EraseEq();
                 Draw.DrawEq(this);
+                return true;
             }
         }
     }

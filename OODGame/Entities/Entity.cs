@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace OODGame.Entities
 {
     public abstract class Entity
     {
-        public string Name { get; }
-        public Entity() { Name=string.Empty;}
+        public string Name { get; protected set; }
+        public Entity() { Name = string.Empty; }
     }
+
     public abstract class Enemy : Entity
     {
-        public int Armor { get; }
-        public int Damage { get; } 
-        public int AttackSpeed { get; }
-        public int MaxHealth { get; }
+        public int Armor { get; protected set; }
+        public int Damage { get; protected set; }
+        public int MaxHealth { get; protected set; }
         public int Health { get; set; }
+
+        public bool IsAlive => Health > 0;
     }
 }
+

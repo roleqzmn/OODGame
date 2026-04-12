@@ -1,21 +1,19 @@
 ﻿using OODGame.Map;
+using OODGame.Map;
 using OODGame.Players;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OODGame.Actions
 {
     public class Actions
     {
         Game Game { get; set; }
-        public Dictionary<ConsoleKey, Action> actions;
+        private readonly Dictionary<ConsoleKey, Action> _actions;
         public Actions(Game game)
         {
             Game = game;
-            actions = new Dictionary<ConsoleKey, Action>
+            _actions = new Dictionary<ConsoleKey, Action>
             {
                 { ConsoleKey.W, () => TryMove(Game.Player.Xpos, Game.Player.Ypos - 1) },
                 { ConsoleKey.S, () => TryMove(Game.Player.Xpos, Game.Player.Ypos + 1) },
@@ -27,16 +25,28 @@ namespace OODGame.Actions
             };
         }
 
+        public void Handle(ConsoleKey key)
+        {
+            if (_actions.TryGetValue(key, out var action))
+                action.Invoke();
+        }
+
         private void InteractWithTile()
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
+            bool isCombat = tile is EnemyTile;
             Game.Player.InteractWithTile(tile);
+            if (isCombat)
+                Game.RedrawScreen();
+            else
+                Game.RefreshUI();
         }
 
         private void OpenPlayerInventory()
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
             Game.Player.OpenInventory(tile);
+            Game.RefreshUI();
         }
         private void TryMove(int newX, int newY)
         {

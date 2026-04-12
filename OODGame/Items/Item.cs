@@ -16,7 +16,7 @@ namespace OODGame.Items
         public Int16 Weight { get; set; }
         public abstract void OnPickedUp(Player player);
         public abstract bool CanEquip(Player player);
-        public abstract void Equip(Player player);
+        public abstract bool Equip(Player player);
         public Item(){
             Name=string.Empty; Description=string.Empty;
         }

@@ -12,14 +12,10 @@ namespace OODGame.Items
     {
         public Int16 Damage { get; set; }
         public Int16 MinLvl { get; set; }
-        public Int16 AttackRate { get; set; }
         public Int16 Range { get; set; }
         public abstract bool IsTwoHanded { get; }
         public abstract void Attack(Player player, Enemy enemy);
-        public override void Equip(Player player)
-        {
-            player.EquipWeapon(this);
-        }
+        public override bool Equip(Player player) => player.EquipWeapon(this);
     }
     public abstract class OneHandedWeapon : Weapon
     {

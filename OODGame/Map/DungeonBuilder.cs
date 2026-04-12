@@ -1,7 +1,9 @@
 using System;
 using System;
 using System.Collections.Generic;
+using OODGame.Entities;
 using OODGame.Items;
+using OODGame.Items.Weapons;
 
 namespace OODGame.Map
 {
@@ -248,29 +250,47 @@ namespace OODGame.Map
             }
             return this;
         }
-        public DungeonBuilder AddWeapons(List<Weapon> weapons, int weaponCount)
+        public DungeonBuilder AddWeapons(Func<Weapon> weaponFactory, int weaponCount)
         {
             ThrowIfNotInitialized();
 
-            if (weapons == null || weapons.Count == 0)
-                return this;
-
-            int placedWeapons = 0;
+            int placed = 0;
             int maxAttempts = weaponCount * 10;
             int attempts = 0;
 
-            while (placedWeapons < weaponCount && attempts < maxAttempts)
+            while (placed < weaponCount && attempts < maxAttempts)
             {
                 int x = _random.Next(_width);
                 int y = _random.Next(_height);
 
                 if (_grid[y, x] is EmptyTile emptyTile)
                 {
-                    var weapon = weapons[_random.Next(weapons.Count)];
-                    emptyTile.PlaceItem(weapon);
-                    placedWeapons++;
+                    emptyTile.PlaceItem(weaponFactory());
+                    placed++;
                 }
+                attempts++;
+            }
+            return this;
+        }
 
+        public DungeonBuilder AddEnemies(Func<Enemy> enemyFactory, int enemyCount)
+        {
+            ThrowIfNotInitialized();
+
+            int placed = 0;
+            int maxAttempts = enemyCount * 10;
+            int attempts = 0;
+
+            while (placed < enemyCount && attempts < maxAttempts)
+            {
+                int x = _random.Next(1, _width - 1);
+                int y = _random.Next(1, _height - 1);
+
+                if (_grid[y, x] is EmptyTile)
+                {
+                    _grid[y, x] = new EnemyTile(enemyFactory());
+                    placed++;
+                }
                 attempts++;
             }
             return this;
