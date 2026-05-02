@@ -31,7 +31,7 @@ namespace OODGame.Actions
                 action.Invoke();
         }
 
-        private void InteractWithTile()
+        private void InteractWithTile() //przenies wszystko do oddzielnych akcji 
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
             bool isCombat = tile is EnemyTile;

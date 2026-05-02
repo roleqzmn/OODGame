@@ -24,7 +24,7 @@ namespace OODGame
         private Random _roomRandom = new Random();
         private Actions.Actions actions {  get; set; }
 
-        public Game()
+        public Game(GameConfig config)
         {
             Map = new Room[3, 3];
             CurrentMapX = 1;
@@ -38,8 +38,8 @@ namespace OODGame
             }
 
             CurrentRoom = Map[CurrentMapY, CurrentMapX];
-            Player = new Player(RoomWidth / 2, RoomHeight / 2);
-            actions = new Actions.Actions(this); 
+            Player = new Player(RoomWidth / 2, RoomHeight / 2, config.PlayerName);
+            actions = new Actions.Actions(this);
         }
 
         private Room GenerateConnectedRoom(int mapX, int mapY)

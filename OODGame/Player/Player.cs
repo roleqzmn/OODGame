@@ -56,7 +56,7 @@ namespace OODGame.Players
         public Attributes Stats { get; private set; }
         public EquippedItems EItems { get; set; }
         public string Name { get; }
-        public List<Item> Inventory { get; set; } //for later
+        public List<Item> Inventory { get; set; } //zrób klase inventory deklu
         public char Symbol { get; } = '¶';
         public Player(int startX = 0, int startY = 0, string name = "roleq"){
             Xpos = startX;
@@ -144,7 +144,7 @@ namespace OODGame.Players
                 tile.Interact(this);
         }
 
-        public bool EquipWeapon(Weapon item)
+        public bool EquipWeapon(Weapon item) //przenies do equpped item
         {
             if (!item.CanEquip(this))
                 return false;
