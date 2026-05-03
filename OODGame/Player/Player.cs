@@ -1,5 +1,7 @@
 ﻿using OODGame.Items;
+using OODGame.Actions;
 using OODGame.Map;
+using OODGame.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +34,7 @@ namespace OODGame.Players
             Luck = lck;
             Aggression = agg;
             Wisdom = wis;
-            InventoryLimit = lim;
+            InventoryLimit = lim; //przepisac ten kontruktor
         }
     }
     public class EquippedItems
@@ -46,7 +48,7 @@ namespace OODGame.Players
         public Armor? Boots { get; set; }
         public Armor? Gloves { get; set; }
     }
-    public class Player
+    public class Player: IEntity
     {
         public int Xpos { get; set; }
         public int Ypos { get; set; }
@@ -56,29 +58,66 @@ namespace OODGame.Players
         public Attributes Stats { get; private set; }
         public EquippedItems EItems { get; set; }
         public string Name { get; }
-        public List<Item> Inventory { get; set; } //zrób klase inventory deklu
+        public Inventory Inventory { get; set; } //zrób klase inventory deklu
         public char Symbol { get; } = '¶';
         public Player(int startX = 0, int startY = 0, string name = "roleq"){
             Xpos = startX;
             Ypos = startY;
             Name = name;
-            Inventory = new List<Item>();
+            Inventory = new Inventory(20);
             Stats = new Attributes(10, 10, 100, 5, 2, 5, 20);
             EItems = new EquippedItems();
+            SyncCurrentLoad();
         }
-        public bool CanPickup(Item item) => (item.Weight + Stats.CurrentLoad < Stats.InventoryLimit);
-        public void Pickup(Item item) {
-            Inventory.Add(item);
-            Stats.CurrentLoad += item.Weight;
+
+        public bool CanPickup(Item item) => Inventory.CurrentLoad + item.Weight <= Stats.InventoryLimit;
+
+        public bool TryPickup(Item item)
+        {
+            if (!CanPickup(item))
+                return false;
+
+            bool picked = Inventory.AddItem(item);
+            if (picked)
+                SyncCurrentLoad();
+
+            return picked;
         }
+
+        public bool TryDrop(Item item, Tile tile)
+        {
+            if (!tile.CanPlace())
+                return false;
+
+            if (!Inventory.RemoveItem(item))
+                return false;
+
+            tile.PlaceItem(item);
+            SyncCurrentLoad();
+            return true;
+        }
+
+        public void Pickup(Item item)
+        {
+            TryPickup(item);
+        }
+
+        private void SyncCurrentLoad()
+        {
+            Stats.CurrentLoad = Inventory.CurrentLoad;
+        }
+
         private void ReturnToInventory(Weapon item) {
-            Inventory.Add(item);
+            if (Inventory.AddItem(item))
+                SyncCurrentLoad();
         }
+
         public void OpenInventory(Tile tile)
         {
+            var playerActions = new PlayerActions();
             if (Inventory.Count == 0) return;
             int i = 0;
-            Draw.DrawItems(Inventory);
+            Draw.DrawItems(Inventory.Items);
             Draw.DrawItemInv(Inventory[i], this);
             while (true)
             {
@@ -88,7 +127,7 @@ namespace OODGame.Players
                 switch (key)
                 {
                     case ConsoleKey.Escape:
-                        Draw.EraseItems(Inventory); Draw.EraseItem();
+                        Draw.EraseItems(Inventory.Items); Draw.EraseItem();
                         return;
                     case ConsoleKey.LeftArrow:
                         if (i > 0) i--;
@@ -102,34 +141,27 @@ namespace OODGame.Players
                         if (Inventory[i].CanEquip(this))
                         {
                             var itemToEquip = Inventory[i];
-                            Stats.CurrentLoad -= itemToEquip.Weight;
                             if (itemToEquip.Equip(this))
                             {
-                                Inventory.Remove(itemToEquip);
-                                if (Inventory.Count < 1) { Draw.EraseItem(); Draw.EraseItems(Inventory); return; }
+                                Inventory.RemoveItem(itemToEquip);
+                                SyncCurrentLoad();
+                                if (Inventory.Count < 1) { Draw.EraseItem(); Draw.EraseItems(Inventory.Items); return; }
                                 if (i >= Inventory.Count) i = Inventory.Count - 1;
                                 Draw.EraseItem();
-                                Draw.EraseItems(Inventory);
-                                Draw.DrawItems(Inventory);
+                                Draw.EraseItems(Inventory.Items);
+                                Draw.DrawItems(Inventory.Items);
                                 Draw.DrawItemInv(Inventory[i], this);
-                            }
-                            else
-                            {
-                                Stats.CurrentLoad += itemToEquip.Weight;
                             }
                         }
                         break;
                     case ConsoleKey.Q:
-                        if (tile.CanPlace())
+                        if (playerActions.DropFromInventory(this, tile, i).Success)
                         {
-                            tile.PlaceItem(Inventory[i]);
-                            Stats.CurrentLoad -= Inventory[i].Weight;
-                            Inventory.RemoveAt(i);
                             Draw.EraseItem();
-                            Draw.EraseItems(Inventory);
+                            Draw.EraseItems(Inventory.Items);
                             if (Inventory.Count < 1) return;
                             if (i >= Inventory.Count) i = Inventory.Count - 1;
-                            Draw.DrawItems(Inventory);
+                            Draw.DrawItems(Inventory.Items);
                             Draw.DrawItemInv(Inventory[i], this);
                         }
                         break;

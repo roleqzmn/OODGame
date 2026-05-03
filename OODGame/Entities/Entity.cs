@@ -1,14 +1,14 @@
 ﻿using System;
 namespace OODGame.Entities
 {
-    public abstract class Entity
+    public interface IEntity
     {
-        public string Name { get; protected set; }
-        public Entity() { Name = string.Empty; }
+        string Name { get; }
     }
 
-    public abstract class Enemy : Entity
+    public abstract class Enemy : IEntity
     {
+        public string Name { get; protected set; }
         public int Armor { get; protected set; }
         public int Damage { get; protected set; }
         public int MaxHealth { get; protected set; }

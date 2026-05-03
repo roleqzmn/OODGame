@@ -1,6 +1,7 @@
 using OODGame.Items;
 using OODGame.Items.Unequipable;
 using OODGame.Players;
+using OODGame.Actions;
 using System;
 using System.Collections.Generic;
 
@@ -8,6 +9,7 @@ namespace OODGame.Map
 {
     public class ChestTile : Tile
     {
+        private static readonly PlayerActions _playerActions = new PlayerActions();
         public List<Item> Items { get; protected set; }
 
         public ChestTile() 
@@ -51,11 +53,8 @@ namespace OODGame.Map
                         break;
 
                     case ConsoleKey.E:
-                        if (player.CanPickup(Items[i]))
+                        if (_playerActions.PickupFromTile(player, Items, i).Success)
                         {
-                            player.Pickup(Items[i]);
-                            Items.RemoveAt(i);
-
                             if (Items.Count == 0)
                             {
                                 Draw.EraseItems(Items);
