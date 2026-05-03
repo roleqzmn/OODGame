@@ -8,7 +8,7 @@ namespace OODGame
     public sealed class GameConfig
     {
         public string PlayerName { get; set; } = "roleq";
-        public string LogPath { get; set; } = ".\\logs.txt";
+        public string LogPath { get; set; } = ".\\logs";
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public DungeonThemeType DungeonTheme { get; set; } = DungeonThemeType.Random;
 

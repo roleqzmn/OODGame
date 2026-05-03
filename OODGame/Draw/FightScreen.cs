@@ -50,9 +50,17 @@ namespace OODGame.Fight
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("  You have been defeated. GAME OVER.");
+                Console.ResetColor();
+                string? logPath = OODGame.Logger.EventLogger.Instance?.FilePath;
+                if (logPath != null)
+                {
+                    Console.SetCursorPosition(0, 7);
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine($"  Log saved to: {logPath}");
+                }
             }
             Console.ResetColor();
-            Console.SetCursorPosition(0, 7);
+            Console.SetCursorPosition(0, 9);
             Console.Write("  Press any key to continue...");
             Console.ReadKey(true);
         }

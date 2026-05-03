@@ -223,6 +223,31 @@ namespace OODGame.Map
             }
             return this;
         }
+        public DungeonBuilder AddScatteredTrees(int treeCount = 40, int clusterChance = 30)
+        {
+            ThrowIfNotInitialized();
+
+            for (int i = 0; i < treeCount; i++)
+            {
+                int x = _random.Next(1, _width - 1);
+                int y = _random.Next(1, _height - 1);
+
+                _grid[y, x] = new WallTile();
+
+                if (_random.Next(100) < clusterChance)
+                {
+                    int[] dx = { -1, 1, 0, 0 };
+                    int[] dy = { 0, 0, -1, 1 };
+                    int dir = _random.Next(4);
+                    int nx = x + dx[dir];
+                    int ny = y + dy[dir];
+                    if (nx > 0 && nx < _width - 1 && ny > 0 && ny < _height - 1)
+                        _grid[ny, nx] = new WallTile();
+                }
+            }
+            return this;
+        }
+
         public DungeonBuilder AddItems(List<Item> items, int itemCount)
         {
             ThrowIfNotInitialized();

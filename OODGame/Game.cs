@@ -1,7 +1,6 @@
 ﻿using OODGame.Items;
 using OODGame.Dungeon;
 using OODGame.Entities;
-using OODGame.Items;
 using OODGame.Items.Unequipable;
 using OODGame.Items.Weapons;
 using OODGame.Map;
@@ -27,16 +26,19 @@ namespace OODGame
         private readonly IDungeonTheme _theme;
         private readonly Random _roomRandom = new Random();
         private Actions.Actions actions { get; set; }
-
+        private string LogFile;
         public Game(GameConfig config)
         {
-            EventLogger.GetInstance(config.LogPath);
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            string logDir = Path.GetDirectoryName(config.LogPath) ?? ".";
+            LogFile = Path.Combine(logDir, $"{config.PlayerName}_{timestamp}.txt");
+            EventLogger.GetInstance(LogFile);
             _theme = DungeonThemeFactory.Create(config.DungeonTheme);
 
             Map = new Room[3, 3];
             CurrentMapX = 1;
             CurrentMapY = 1;
-            // Artefakt trafia tylko do pokoju środkowego (1,1)
+
             for (int y = 0; y < 3; y++)
                 for (int x = 0; x < 3; x++)
                     Map[y, x] = GenerateConnectedRoom(x, y, isCenter: x == 1 && y == 1);
@@ -67,6 +69,7 @@ namespace OODGame
             Draw.DrawPlayer(this);
             Draw.DrawUI(this);
             Draw.DrawEq(Player);
+            Draw.DrawRecentLogs();
 
             IsRunning = true;
             while (IsRunning)
@@ -87,12 +90,14 @@ namespace OODGame
             Draw.DrawPlayer(this);
             Draw.DrawUI(this);
             Draw.DrawEq(Player);
+            Draw.DrawRecentLogs();
         }
 
         public void RefreshUI()
         {
             Draw.DrawUI(this);
             Draw.DrawEq(Player);
+            Draw.DrawRecentLogs();
         }
 
       
@@ -109,5 +114,6 @@ namespace OODGame
                 itemTile.PlaceItem(item);
             }
         }
+        
     }
 }

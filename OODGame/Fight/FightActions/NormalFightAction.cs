@@ -10,7 +10,7 @@ namespace OODGame.Fight.Actions
         public void Execute(FightContext ctx)
         {
             var visitor = new NormalAttackVisitor();
-            int dealt = Math.Max(0, ctx.GetDamage(visitor) - ctx.Enemy.Armor);
+            int dealt = Math.Max(1, ctx.GetDamage(visitor) - ctx.Enemy.Armor);
             int taken  = Math.Max(1, ctx.Enemy.Damage - ctx.GetDefense(visitor));
 
             ctx.Enemy.Health -= dealt;

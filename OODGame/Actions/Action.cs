@@ -21,6 +21,7 @@ namespace OODGame.Actions
                 { ConsoleKey.D, () => TryMove(Game.Player.Xpos + 1,  Game.Player.Ypos) },
                 { ConsoleKey.E, () => InteractWithTile() },
                 { ConsoleKey.I, () => OpenPlayerInventory() },
+                { ConsoleKey.J, () => ShowFullLog() },
                 { ConsoleKey.Escape, () => QuitGame() }
             };
         }
@@ -29,7 +30,15 @@ namespace OODGame.Actions
         {
             if (_actions.TryGetValue(key, out var action))
                 action.Invoke();
+            else
+                EventLogger.Instance?.LogEvent("Pressed an unknown key.");
         }
+        private void ShowFullLog()
+        {
+            EventLogger.Instance?.ViewAllLogs();
+            Draw.RedrawFull(Game);
+        }
+
         public void QuitGame()
         {
             EventLogger.Instance?.LogEvent("Game exited.");

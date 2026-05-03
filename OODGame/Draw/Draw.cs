@@ -115,13 +115,13 @@ namespace OODGame
         public static void EraseItem()
         {
             Console.SetCursorPosition(45, 13);
-            Console.Write("                                    ");
+            Console.Write("                                                                 ");
 
             Console.SetCursorPosition(45, 14);
-            Console.Write("                                    ");
+            Console.Write("                                                                 ");
 
             Console.SetCursorPosition(45, 15);
-            Console.Write("                                    ");
+            Console.Write("                                                                 ");
         }
 
         public static void DrawItemInv(Item item, Player player)
@@ -186,6 +186,50 @@ namespace OODGame
         {
             Console.SetCursorPosition(70, 13);
             Console.Write("                                              ");
+        }
+
+        public static void DrawRecentLogs()
+        {
+            var logs = OODGame.Logger.EventLogger.Instance?.RecentEvents;
+            if (logs == null) return;
+            int x = 45;
+            int startY = 22;
+            Console.SetCursorPosition(x, startY - 1);
+            Console.Write("--- Recent Events ---          ");
+            for (int i = 0; i < 8; i++)
+            {
+                Console.SetCursorPosition(x, startY + i);
+                string line = i < logs.Count ? logs[i] : string.Empty;
+                if (line.Length > 45) line = line[..45];
+                Console.Write(line.PadRight(45));
+            }
+        }
+        public static void DrawLogViewer(List<string> lines, int scroll, int visibleRows)
+        {
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write($"=== EVENT LOG  [{scroll + 1}-{Math.Min(scroll + visibleRows, lines.Count)}/{lines.Count}]  ");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("UP/DOWN - scroll  |  ESC - return ===");
+            Console.ResetColor();
+
+            for (int i = scroll; i < Math.Min(scroll + visibleRows, lines.Count); i++)
+            {
+                string line = lines[i];
+                if (line.Length > Console.WindowWidth - 1)
+                    line = line[..(Console.WindowWidth - 1)];
+                Console.WriteLine(line);
+            }
+        }
+
+        public static void RedrawFull(Game game)
+        {
+            Console.Clear();
+            Draw.DrawRoom(game);
+            Draw.DrawPlayer(game);
+            Draw.DrawUI(game);
+            Draw.DrawEq(game.Player);
         }
     }
 }
