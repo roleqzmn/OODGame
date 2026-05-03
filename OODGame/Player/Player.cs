@@ -21,7 +21,6 @@ namespace OODGame.Players
         public int Aggression { get; set; }
         public int Wisdom { get; set; }
         public int InventoryLimit { get; set; }
-        public int CurrentLoad { get; set; }
         public int Gold { get; set; }
         public int Coins { get; set; }
 
@@ -58,7 +57,8 @@ namespace OODGame.Players
         public Attributes Stats { get; private set; }
         public EquippedItems EItems { get; set; }
         public string Name { get; }
-        public Inventory Inventory { get; set; } //zrób klase inventory deklu
+        public Inventory Inventory { get; set; }
+        public int CurrentLoad => Inventory.CurrentLoad;
         public char Symbol { get; } = '¶';
         public Player(int startX = 0, int startY = 0, string name = "roleq"){
             Xpos = startX;
@@ -67,7 +67,6 @@ namespace OODGame.Players
             Inventory = new Inventory(20);
             Stats = new Attributes(10, 10, 100, 5, 2, 5, 20);
             EItems = new EquippedItems();
-            SyncCurrentLoad();
         }
 
         public bool CanPickup(Item item) => Inventory.CurrentLoad + item.Weight <= Stats.InventoryLimit;
@@ -76,24 +75,16 @@ namespace OODGame.Players
         {
             if (!CanPickup(item))
                 return false;
-
-            bool picked = Inventory.AddItem(item);
-            if (picked)
-                SyncCurrentLoad();
-
-            return picked;
+            return Inventory.AddItem(item);
         }
 
         public bool TryDrop(Item item, Tile tile)
         {
             if (!tile.CanPlace())
                 return false;
-
             if (!Inventory.RemoveItem(item))
                 return false;
-
             tile.PlaceItem(item);
-            SyncCurrentLoad();
             return true;
         }
 
@@ -102,72 +93,14 @@ namespace OODGame.Players
             TryPickup(item);
         }
 
-        private void SyncCurrentLoad()
+        private void ReturnToInventory(Weapon item)
         {
-            Stats.CurrentLoad = Inventory.CurrentLoad;
-        }
-
-        private void ReturnToInventory(Weapon item) {
-            if (Inventory.AddItem(item))
-                SyncCurrentLoad();
+            Inventory.AddItem(item);
         }
 
         public void OpenInventory(Tile tile)
         {
-            var playerActions = new PlayerActions();
-            if (Inventory.Count == 0) return;
-            int i = 0;
-            Draw.DrawItems(Inventory.Items);
-            Draw.DrawItemInv(Inventory[i], this);
-            while (true)
-            {
-                int size = Inventory.Count;
-                var key = Console.ReadKey(true).Key;
-
-                switch (key)
-                {
-                    case ConsoleKey.Escape:
-                        Draw.EraseItems(Inventory.Items); Draw.EraseItem();
-                        return;
-                    case ConsoleKey.LeftArrow:
-                        if (i > 0) i--;
-                        Draw.EraseItem(); Draw.DrawItemInv(Inventory[i], this);
-                        break;
-                    case ConsoleKey.RightArrow:
-                        if (i < size - 1) i++;
-                        Draw.EraseItem(); Draw.DrawItemInv(Inventory[i], this);
-                        break;
-                    case ConsoleKey.E:
-                        if (Inventory[i].CanEquip(this))
-                        {
-                            var itemToEquip = Inventory[i];
-                            if (itemToEquip.Equip(this))
-                            {
-                                Inventory.RemoveItem(itemToEquip);
-                                SyncCurrentLoad();
-                                if (Inventory.Count < 1) { Draw.EraseItem(); Draw.EraseItems(Inventory.Items); return; }
-                                if (i >= Inventory.Count) i = Inventory.Count - 1;
-                                Draw.EraseItem();
-                                Draw.EraseItems(Inventory.Items);
-                                Draw.DrawItems(Inventory.Items);
-                                Draw.DrawItemInv(Inventory[i], this);
-                            }
-                        }
-                        break;
-                    case ConsoleKey.Q:
-                        if (playerActions.DropFromInventory(this, tile, i).Success)
-                        {
-                            Draw.EraseItem();
-                            Draw.EraseItems(Inventory.Items);
-                            if (Inventory.Count < 1) return;
-                            if (i >= Inventory.Count) i = Inventory.Count - 1;
-                            Draw.DrawItems(Inventory.Items);
-                            Draw.DrawItemInv(Inventory[i], this);
-                        }
-                        break;
-                    default: break;
-                }
-            }
+            Inventory.Open(this, tile);
         }
 
         public void InteractWithTile(Tile tile)

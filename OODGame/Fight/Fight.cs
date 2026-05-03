@@ -45,11 +45,11 @@ namespace OODGame.Fight
             var key = Console.ReadKey(true).Key;
             switch (key)
             {
-                case ConsoleKey.W:
+                case ConsoleKey.UpArrow:
                     if (_selectedIdx > 0) _selectedIdx--;
                     FightScreen.Draw(_ctx, _actions, _selectedIdx);
                     break;
-                case ConsoleKey.S:
+                case ConsoleKey.DownArrow:
                     if (_selectedIdx < _actions.Count - 1) _selectedIdx++;
                     FightScreen.Draw(_ctx, _actions, _selectedIdx);
                     break;

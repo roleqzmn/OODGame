@@ -1,6 +1,7 @@
 using OODGame.Items;
 using OODGame.Map;
 using OODGame.Players;
+using OODGame.Logger;
 using System.Collections.Generic;
 
 namespace OODGame.Actions
@@ -40,6 +41,7 @@ namespace OODGame.Actions
                 return new PlayerActionResult(false, "Cannot pick up this item.");
 
             _tileItems.RemoveAt(_itemIndex);
+            EventLogger.Instance?.LogEvent($"Player picked up: {item.Name}.");
             return new PlayerActionResult(true, $"Picked up {item.Name}.");
         }
     }

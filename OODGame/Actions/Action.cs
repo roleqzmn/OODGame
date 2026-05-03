@@ -1,6 +1,6 @@
 ﻿using OODGame.Map;
-using OODGame.Map;
 using OODGame.Players;
+using OODGame.Logger;
 using System;
 using System.Collections.Generic;
 
@@ -21,7 +21,7 @@ namespace OODGame.Actions
                 { ConsoleKey.D, () => TryMove(Game.Player.Xpos + 1,  Game.Player.Ypos) },
                 { ConsoleKey.E, () => InteractWithTile() },
                 { ConsoleKey.I, () => OpenPlayerInventory() },
-                { ConsoleKey.Escape, () => Game.IsRunning = false }
+                { ConsoleKey.Escape, () => QuitGame() }
             };
         }
 
@@ -30,8 +30,12 @@ namespace OODGame.Actions
             if (_actions.TryGetValue(key, out var action))
                 action.Invoke();
         }
-
-        private void InteractWithTile() //przenies wszystko do oddzielnych akcji 
+        public void QuitGame()
+        {
+            EventLogger.Instance?.LogEvent("Game exited.");
+            Game.IsRunning=false;
+        }
+        private void InteractWithTile()
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
             bool isCombat = tile is EnemyTile;
@@ -106,11 +110,13 @@ namespace OODGame.Actions
                 if (Game.CurrentRoom.Grid[newY, newX].CanEnter())
                 {
                     Draw.ErasePlayer(Game);
-
                     Game.Player.Xpos = newX;
                     Game.Player.Ypos = newY;
-
                     Draw.DrawPlayer(Game);
+                }
+                else
+                {
+                    EventLogger.Instance?.LogEvent($"Player tried to walk into a wall at ({newX},{newY}).");
                 }
             }
         }

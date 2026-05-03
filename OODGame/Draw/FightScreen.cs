@@ -22,7 +22,7 @@ namespace OODGame.Fight
             WriteAt(4, $"Player: {ctx.Player.Name,-15} HP: {ctx.Player.Stats.Health,3}/{ctx.Player.Stats.MaxHealth,-3}", Width);
             WriteAt(5, $"Weapon: {(weapon != null ? weapon.Name : "none"),-40}", Width);
             WriteAt(7, $"> {ctx.LastLog,-58}", Width);
-            WriteAt(9, "Choose action [W/S = navigate, E = confirm]:", Width);
+            WriteAt(9, "Choose action [Up/down = navigate, E = confirm]:", Width);
 
             for (int i = 0; i < actions.Count; i++)
             {

@@ -11,4 +11,10 @@
     <Folder Include="Player\PlayerClasses\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="GameConfig.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
 using OODGame.Items;
+using OODGame.Dungeon;
 using OODGame.Map;
 using OODGame.Players;
 using System;
@@ -8,6 +9,24 @@ namespace OODGame
 {
     public class Draw
     {
+        public static void DrawIntro(IDungeonTheme theme)
+        {
+            Console.Clear();
+            Console.SetCursorPosition(0, 3);
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"  === {theme.Name.ToUpper()} ===");
+            Console.ResetColor();
+            Console.WriteLine();
+            foreach (var line in theme.IntroMessage.Split('\n'))
+                Console.WriteLine($"  {line}");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("  Press any key to begin...");
+            Console.ResetColor();
+            Console.ReadKey(true);
+        }
+
+
         public static void DrawRoom(Game game)
         {
             Console.SetCursorPosition(0, 0);
@@ -45,7 +64,7 @@ namespace OODGame
             Console.Write($"Health: {game.Player.Stats.Health}/{game.Player.Stats.MaxHealth}    ");
 
             Console.SetCursorPosition(X, 3);
-            Console.Write($"Load: {game.Player.Stats.CurrentLoad}/{game.Player.Stats.InventoryLimit}    ");
+            Console.Write($"Load: {game.Player.CurrentLoad}/{game.Player.Stats.InventoryLimit}    ");
 
             Console.SetCursorPosition(X, 4);
             Console.Write($"Strength: {game.Player.Stats.Strength}    ");

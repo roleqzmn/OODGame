@@ -2,6 +2,7 @@ using OODGame.Entities;
 using OODGame.Fight;
 using OODGame.Items;
 using OODGame.Players;
+using OODGame.Logger;
 
 namespace OODGame.Map
 {
@@ -25,9 +26,13 @@ namespace OODGame.Map
             bool enemyDefeated = fight.Run();
 
             if (enemyDefeated)
+            {
+                EventLogger.Instance?.LogEvent($"{player.Name} defeated {Enemy.Name}.");
                 Symbol = ' ';
+            }
         }
 
         public override void PlaceItem(Item item) { }
     }
 }
+

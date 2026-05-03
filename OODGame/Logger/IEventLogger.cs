@@ -8,7 +8,7 @@ using OODGame.Actions;
 using OODGame;
 namespace OODGame.Logger
 {
-    public sealed interface IEventLogger<TIn>
+    public interface IEventLogger<TIn>
     {
         public void LogEvent(TIn message);
 

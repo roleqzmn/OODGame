@@ -273,6 +273,26 @@ namespace OODGame.Map
             return this;
         }
 
+        public DungeonBuilder AddArtifact(Item artifact, bool place)
+        {
+            if (!place) return this;
+            ThrowIfNotInitialized();
+
+            int attempts = 0;
+            while (attempts < _width * _height)
+            {
+                int x = _random.Next(1, _width - 1);
+                int y = _random.Next(1, _height - 1);
+                if (_grid![y, x] is EmptyTile tile)
+                {
+                    tile.PlaceItem(artifact);
+                    return this;
+                }
+                attempts++;
+            }
+            return this;
+        }
+
         public DungeonBuilder AddEnemies(Func<Enemy> enemyFactory, int enemyCount)
         {
             ThrowIfNotInitialized();

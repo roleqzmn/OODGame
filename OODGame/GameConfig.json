@@ -1,4 +1,5 @@
 {
   "PlayerName": "roleqzmn",
-  "LogPath": "/logs/logs.txt"
+  "LogPath": ".\\logs\\logs.txt",
+  "DungeonTheme": "Random"
 }
