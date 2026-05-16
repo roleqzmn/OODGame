@@ -2,6 +2,7 @@ using OODGame.Items;
 using OODGame.Dungeon;
 using OODGame.Map;
 using OODGame.Players;
+using OODGame.Logger;
 using System;
 using System.Collections.Generic;
 
@@ -38,7 +39,7 @@ namespace OODGame
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine("If you stand on Item tile, press [E] to interact [ESC] to quit\nPress [I] to open inventory.\nWalk with [W][A][S][D].\nUse arrows to navigate in inventory");
+            Console.WriteLine("If you stand on Item tile, press [E] to interact. Combat starts automatically on enemy tile. [ESC] to quit\nPress [I] to open inventory.\nWalk with [W][A][S][D].\nUse arrows to navigate in inventory");
         }
 
         public static void DrawPlayer(Game game)
@@ -190,7 +191,7 @@ namespace OODGame
 
         public static void DrawRecentLogs()
         {
-            var logs = OODGame.Logger.EventLogger.Instance?.RecentEvents;
+            var logs = EventLogger.Instance?.RecentEvents;
             if (logs == null) return;
             int x = 45;
             int startY = 22;
@@ -230,6 +231,7 @@ namespace OODGame
             Draw.DrawPlayer(game);
             Draw.DrawUI(game);
             Draw.DrawEq(game.Player);
+            Draw.DrawRecentLogs();
         }
     }
 }

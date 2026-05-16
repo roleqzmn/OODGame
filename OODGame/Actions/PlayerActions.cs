@@ -2,6 +2,8 @@ using OODGame.Items;
 using OODGame.Map;
 using OODGame.Players;
 using OODGame.Logger;
+using OODGame.Events;
+using OODGame.Items.WeaponTypes;
 using System.Collections.Generic;
 
 namespace OODGame.Actions
@@ -42,6 +44,26 @@ namespace OODGame.Actions
 
             _tileItems.RemoveAt(_itemIndex);
             EventLogger.Instance?.LogEvent($"Player picked up: {item.Name}.");
+
+            if (item is Weapon weapon)
+            {
+                int range = 1;
+                string category = "Light";
+
+                if (weapon is HeavyWeapon)
+                {
+                    range = 7;
+                    category = "Heavy";
+                }
+                else if (weapon is MagicalWeapon)
+                {
+                    range = 4;
+                    category = "Magical";
+                }
+
+                _player.EventBus?.Publish(new NoiseBroadcastEvent(_player.Xpos, _player.Ypos, range, category));
+            }
+
             return new PlayerActionResult(true, $"Picked up {item.Name}.");
         }
     }

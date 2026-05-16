@@ -5,6 +5,7 @@ namespace OODGame.Entities
         public Wolf()
         {
             Name      = "Wolf";
+            Species   = "Wolf";
             MaxHealth = 25;
             Health    = 25;
             Damage    = 6;
@@ -14,6 +15,7 @@ namespace OODGame.Entities
         public Wolf(int health, int damage, int armor)
         {
             Name      = "Wolf";
+            Species   = "Wolf";
             MaxHealth = health;
             Health    = health;
             Damage    = damage;

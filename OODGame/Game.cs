@@ -45,18 +45,34 @@ namespace OODGame
 
             CurrentRoom = Map[CurrentMapY, CurrentMapX];
             Player = new Player(RoomWidth / 2, RoomHeight / 2, config.PlayerName);
+            Player.EventBus = CurrentRoom.EventBus;
             actions = new Actions.Actions(this);
         }
 
         private Room GenerateConnectedRoom(int mapX, int mapY, bool isCenter)
         {
-            return _theme.GenerationStrategy.Generate(
+            Room room = _theme.GenerationStrategy.Generate(
                 new DungeonBuilder(RoomWidth, RoomHeight),
                 mapX, mapY,
                 _theme.EnemyFactory,
                 _theme.GetPossibleItems(),
                 _theme.CreateArtifact(),
                 placeArtifact: isCenter);
+
+            RegisterRoomEnemySubscriptions(room);
+            return room;
+        }
+
+        private static void RegisterRoomEnemySubscriptions(Room room)
+        {
+            for (int y = 0; y < room.Height; y++)
+            {
+                for (int x = 0; x < room.Width; x++)
+                {
+                    if (room.Grid[y, x] is EnemyTile enemyTile)
+                        room.EventBus.Subscribe(enemyTile.Enemy);
+                }
+            }
         }
 
         public void Run()

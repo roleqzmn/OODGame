@@ -1,6 +1,7 @@
 ﻿using OODGame.Items;
 using OODGame.Items.Unequipable;
 using OODGame.Items.Weapons;
+using OODGame.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace OODGame.Map
     public class Room
     {
         public Tile[,] Grid { get; private set; }
+        public IGameEventBus EventBus { get; }
         public readonly int Width;
         public readonly int Height;
 
@@ -20,6 +22,7 @@ namespace OODGame.Map
             Width = width;
             Height = height;
             Grid = grid;
+            EventBus = new GameEventBus();
         }
 
         //private void InitializeMap()

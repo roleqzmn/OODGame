@@ -2,6 +2,7 @@
 using OODGame.Actions;
 using OODGame.Map;
 using OODGame.Entities;
+using OODGame.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +59,7 @@ namespace OODGame.Players
         public EquippedItems EItems { get; set; }
         public string Name { get; }
         public Inventory Inventory { get; set; }
+        public IGameEventBus? EventBus { get; set; }
         public int CurrentLoad => Inventory.CurrentLoad;
         public char Symbol { get; } = '¶';
         public Player(int startX = 0, int startY = 0, string name = "roleq"){

@@ -5,6 +5,7 @@ namespace OODGame.Entities
         public Demon()
         {
             Name      = "Demon";
+            Species   = "Demon";
             MaxHealth = 50;
             Health    = 50;
             Damage    = 10;
@@ -14,6 +15,7 @@ namespace OODGame.Entities
         public Demon(int health, int damage, int armor)
         {
             Name      = "Demon";
+            Species   = "Demon";
             MaxHealth = health;
             Health    = health;
             Damage    = damage;

@@ -71,6 +71,7 @@ namespace OODGame.Actions
             {
                 Game.CurrentMapX--;
                 Game.CurrentRoom = Game.Map[Game.CurrentMapY, Game.CurrentMapX];
+                Game.Player.EventBus = Game.CurrentRoom.EventBus;
                 Game.Player.Xpos = Game.RoomWidth - 2;
                 Game.Player.Ypos = newY;
                 Draw.ErasePlayer(Game);
@@ -83,6 +84,7 @@ namespace OODGame.Actions
             {
                 Game.CurrentMapX++;
                 Game.CurrentRoom = Game.Map[Game.CurrentMapY, Game.CurrentMapX];
+                Game.Player.EventBus = Game.CurrentRoom.EventBus;
                 Game.Player.Xpos = 1;
                 Game.Player.Ypos = newY;
                 Draw.ErasePlayer(Game);
@@ -95,6 +97,7 @@ namespace OODGame.Actions
             {
                 Game.CurrentMapY--;
                 Game.CurrentRoom = Game.Map[Game.CurrentMapY, Game.CurrentMapX];
+                Game.Player.EventBus = Game.CurrentRoom.EventBus;
                 Game.Player.Xpos = newX;
                 Game.Player.Ypos = Game.RoomHeight - 2;
                 Draw.ErasePlayer(Game);
@@ -107,6 +110,7 @@ namespace OODGame.Actions
             {
                 Game.CurrentMapY++;
                 Game.CurrentRoom = Game.Map[Game.CurrentMapY, Game.CurrentMapX];
+                Game.Player.EventBus = Game.CurrentRoom.EventBus;
                 Game.Player.Xpos = newX;
                 Game.Player.Ypos = 1;
                 Draw.ErasePlayer(Game);
@@ -116,12 +120,22 @@ namespace OODGame.Actions
             }
             if (newX >= 0 && newX < Game.RoomWidth && newY >= 0 && newY < Game.RoomHeight)
             {
-                if (Game.CurrentRoom.Grid[newY, newX].CanEnter())
+                Tile targetTile = Game.CurrentRoom.Grid[newY, newX];
+                if (targetTile.CanEnter())
                 {
                     Draw.ErasePlayer(Game);
                     Game.Player.Xpos = newX;
                     Game.Player.Ypos = newY;
-                    Draw.DrawPlayer(Game);
+
+                    if (targetTile is EnemyTile)
+                    {
+                        Game.Player.InteractWithTile(targetTile);
+                        Game.RedrawScreen();
+                    }
+                    else
+                    {
+                        Draw.DrawPlayer(Game);
+                    }
                 }
                 else
                 {

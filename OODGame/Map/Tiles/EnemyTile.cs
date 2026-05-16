@@ -3,6 +3,7 @@ using OODGame.Fight;
 using OODGame.Items;
 using OODGame.Players;
 using OODGame.Logger;
+using OODGame.Events;
 
 namespace OODGame.Map
 {
@@ -27,6 +28,8 @@ namespace OODGame.Map
 
             if (enemyDefeated)
             {
+                player.EventBus?.Publish(new EnemyDeathEvent(Enemy.Id, Enemy.Species));
+                player.EventBus?.Unsubscribe(Enemy);
                 EventLogger.Instance?.LogEvent($"{player.Name} defeated {Enemy.Name}.");
                 Symbol = ' ';
             }
