@@ -3,7 +3,6 @@ using OODGame.Map;
 using OODGame.Players;
 using OODGame.Logger;
 using OODGame.Events;
-using OODGame.Items.WeaponTypes;
 using System.Collections.Generic;
 
 namespace OODGame.Actions
@@ -47,20 +46,9 @@ namespace OODGame.Actions
 
             if (item is Weapon weapon)
             {
-                int range = 1;
-                string category = "Light";
-
-                if (weapon is HeavyWeapon)
-                {
-                    range = 7;
-                    category = "Heavy";
-                }
-                else if (weapon is MagicalWeapon)
-                {
-                    range = 4;
-                    category = "Magical";
-                }
-
+                var noiseProfile = weapon as INoiseProfile;
+                int range = noiseProfile?.NoiseRange ?? 1;
+                string category = noiseProfile?.NoiseCategory ?? "Light";
                 _player.EventBus?.Publish(new NoiseBroadcastEvent(_player.Xpos, _player.Ypos, range, category));
             }
 

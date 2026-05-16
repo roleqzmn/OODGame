@@ -54,7 +54,7 @@ namespace OODGame
             Room room = _theme.GenerationStrategy.Generate(
                 new DungeonBuilder(RoomWidth, RoomHeight),
                 mapX, mapY,
-                _theme.EnemyFactory,
+                _theme.EnemyGroups,
                 _theme.GetPossibleItems(),
                 _theme.CreateArtifact(),
                 placeArtifact: isCenter);
@@ -69,8 +69,11 @@ namespace OODGame
             {
                 for (int x = 0; x < room.Width; x++)
                 {
-                    if (room.Grid[y, x] is EnemyTile enemyTile)
-                        room.EventBus.Subscribe(enemyTile.Enemy);
+                    if (room.Grid[y, x] is EmptyTile emptyTile && emptyTile.HasEnemy)
+                    {
+                        emptyTile.Enemy!.SetSpatialContext(x, y, room.Navigator);
+                        room.EventBus.Subscribe(emptyTile.Enemy);
+                    }
                 }
             }
         }

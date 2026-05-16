@@ -14,10 +14,15 @@ namespace OODGame.Dungeon.Themes
         public string IntroMessage =>
             "You descend into an ancient crypt. The air reeks of decay.\nThe dead do not rest here.";
         public IDungeonGenerationStrategy GenerationStrategy { get; } = new CryptGenerationStrategy();
-        public Func<Enemy> EnemyFactory => () => new Skeleton(
-            health: _rng.Next(15, 30),
-            damage: _rng.Next(6, 12),
-            armor:  _rng.Next(0, 3));
+        public IReadOnlyList<EnemySpawnGroup> EnemyGroups => new List<EnemySpawnGroup>
+        {
+            new EnemySpawnGroup(
+                factory: () => new Skeleton(
+                    health: _rng.Next(15, 30),
+                    damage: _rng.Next(6, 12),
+                    armor:  _rng.Next(0, 3)),
+                count: _rng.Next(4, 8))
+        };
 
         public List<Item> GetPossibleItems() => new List<Item>
         {

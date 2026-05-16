@@ -10,6 +10,8 @@ namespace OODGame.Actions
     {
         Game Game { get; set; }
         private readonly Dictionary<ConsoleKey, Action> _actions;
+        private readonly HashSet<ConsoleKey> _turnKeys;
+        private int _turnCounter;
         public Actions(Game game)
         {
             Game = game;
@@ -24,12 +26,34 @@ namespace OODGame.Actions
                 { ConsoleKey.J, () => ShowFullLog() },
                 { ConsoleKey.Escape, () => QuitGame() }
             };
+            _turnKeys = new HashSet<ConsoleKey>
+            {
+                ConsoleKey.W,
+                ConsoleKey.A,
+                ConsoleKey.S,
+                ConsoleKey.D,
+                ConsoleKey.E,
+                ConsoleKey.I
+            };
+            _turnCounter = 0;
         }
 
         public void Handle(ConsoleKey key)
         {
             if (_actions.TryGetValue(key, out var action))
+            {
                 action.Invoke();
+                if (_turnKeys.Contains(key) && Game.IsRunning)
+                {
+                    _turnCounter++;
+                    if (_turnCounter >= 3)
+                    {
+                        var changedPositions = EnemyMovementService.MoveEnemiesRandomly(Game.CurrentRoom, Game.Player.Xpos, Game.Player.Ypos);
+                        Draw.RedrawChangedPositions(Game, changedPositions);
+                        _turnCounter = 0;
+                    }
+                }
+            }
             else
                 EventLogger.Instance?.LogEvent("Pressed an unknown key.");
         }
@@ -47,7 +71,7 @@ namespace OODGame.Actions
         private void InteractWithTile()
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
-            bool isCombat = tile is EnemyTile;
+            bool isCombat = tile is EmptyTile emptyTile && emptyTile.HasEnemy;
             Game.Player.InteractWithTile(tile);
             if (isCombat)
                 Game.RedrawScreen();
@@ -127,7 +151,7 @@ namespace OODGame.Actions
                     Game.Player.Xpos = newX;
                     Game.Player.Ypos = newY;
 
-                    if (targetTile is EnemyTile)
+                    if (targetTile is EmptyTile emptyTile && emptyTile.HasEnemy)
                     {
                         Game.Player.InteractWithTile(targetTile);
                         Game.RedrawScreen();

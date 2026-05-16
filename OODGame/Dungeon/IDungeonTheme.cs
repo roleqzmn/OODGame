@@ -9,7 +9,7 @@ namespace OODGame.Dungeon
         string Name { get; }
         string IntroMessage { get; }
         IDungeonGenerationStrategy GenerationStrategy { get; }
-        Func<Enemy> EnemyFactory { get; }
+        IReadOnlyList<EnemySpawnGroup> EnemyGroups { get; }
         List<Item> GetPossibleItems();
         Item CreateArtifact();
     }

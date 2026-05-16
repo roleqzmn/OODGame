@@ -4,7 +4,7 @@ using OODGame.Fight;
 
 namespace OODGame.Items.Decorators
 {
-    public abstract class WeaponDecorator : Weapon, IWeaponCategory
+    public abstract class WeaponDecorator : Weapon, IWeaponCategory, INoiseProfile
     {
         protected readonly Weapon _wrapped;
 
@@ -36,6 +36,9 @@ namespace OODGame.Items.Decorators
 
         public int AcceptDefense(IDefenseVisitor visitor, Attributes stats)
             => (_wrapped as IWeaponCategory)?.AcceptDefense(visitor, stats) ?? visitor.VisitNoWeapon(stats);
+
+        public int NoiseRange => (_wrapped as INoiseProfile)?.NoiseRange ?? 1;
+        public string NoiseCategory => (_wrapped as INoiseProfile)?.NoiseCategory ?? "Light";
 
         protected abstract void ApplyEffect(Player player);
     }

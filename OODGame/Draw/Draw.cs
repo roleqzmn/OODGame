@@ -224,6 +224,18 @@ namespace OODGame
             }
         }
 
+        public static void RedrawChangedPositions(Game game, IEnumerable<(int x, int y)> changedPositions)
+        {
+            foreach (var (x, y) in changedPositions)
+            {
+                Console.SetCursorPosition(x, y);
+                Console.Write(game.CurrentRoom.Grid[y, x].Symbol);
+            }
+
+            DrawPlayer(game);
+            DrawRecentLogs();
+        }
+
         public static void RedrawFull(Game game)
         {
             Console.Clear();

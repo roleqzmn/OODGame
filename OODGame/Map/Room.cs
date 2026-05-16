@@ -14,6 +14,7 @@ namespace OODGame.Map
     {
         public Tile[,] Grid { get; private set; }
         public IGameEventBus EventBus { get; }
+        public IMapNavigator Navigator { get; }
         public readonly int Width;
         public readonly int Height;
 
@@ -23,6 +24,7 @@ namespace OODGame.Map
             Height = height;
             Grid = grid;
             EventBus = new GameEventBus();
+            Navigator = new RoomMapNavigator(this);
         }
 
         //private void InitializeMap()

@@ -223,6 +223,21 @@ namespace OODGame.Map
             }
             return this;
         }
+
+        public DungeonBuilder AddEnemyGroups(IEnumerable<EnemySpawnGroup> enemyGroups)
+        {
+            ThrowIfNotInitialized();
+
+            foreach (var group in enemyGroups)
+            {
+                if (group == null || group.Factory == null || group.Count <= 0)
+                    continue;
+
+                AddEnemies(group.Factory, group.Count);
+            }
+
+            return this;
+        }
         public DungeonBuilder AddScatteredTrees(int treeCount = 40, int clusterChance = 30)
         {
             ThrowIfNotInitialized();
@@ -331,9 +346,9 @@ namespace OODGame.Map
                 int x = _random.Next(1, _width - 1);
                 int y = _random.Next(1, _height - 1);
 
-                if (_grid[y, x] is EmptyTile)
+                if (_grid[y, x] is EmptyTile emptyTile && !emptyTile.HasEnemy)
                 {
-                    _grid[y, x] = new EnemyTile(enemyFactory());
+                    emptyTile.SetEnemy(enemyFactory());
                     placed++;
                 }
                 attempts++;

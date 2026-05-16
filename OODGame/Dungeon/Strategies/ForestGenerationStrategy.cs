@@ -10,7 +10,7 @@ namespace OODGame.Dungeon.Strategies
         private static readonly Random _rng = new Random();
 
         public Room Generate(DungeonBuilder builder, int mapX, int mapY,
-                             Func<Enemy> enemyFactory, List<Item> items,
+                             IReadOnlyList<EnemySpawnGroup> enemyGroups, List<Item> items,
                              Item artifact, bool placeArtifact)
         {
             return builder
@@ -18,7 +18,7 @@ namespace OODGame.Dungeon.Strategies
                 .AddScatteredTrees(_rng.Next(35, 55), clusterChance: 35)
                 .AddItems(items, _rng.Next(8, 15))
                 .AddWeapons(WeaponFactory.CreateRandom, _rng.Next(3, 6))
-                .AddEnemies(enemyFactory, _rng.Next(2, 5))
+                .AddEnemyGroups(enemyGroups)
                 .AddArtifact(artifact, placeArtifact)
                 .EnsurePassagesConnected(mapX, mapY, 3, 3)
                 .Build();

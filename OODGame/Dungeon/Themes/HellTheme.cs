@@ -14,10 +14,15 @@ namespace OODGame.Dungeon.Themes
         public string IntroMessage =>
             "The ground burns beneath your feet. Screams echo from the walls.\nYou have walked into Hell itself.";
         public IDungeonGenerationStrategy GenerationStrategy { get; } = new HellGenerationStrategy();
-        public Func<Enemy> EnemyFactory => () => new Demon(
-            health: _rng.Next(35, 60),
-            damage: _rng.Next(8, 14),
-            armor:  _rng.Next(3, 7));
+        public IReadOnlyList<EnemySpawnGroup> EnemyGroups => new List<EnemySpawnGroup>
+        {
+            new EnemySpawnGroup(
+                factory: () => new Demon(
+                    health: _rng.Next(35, 60),
+                    damage: _rng.Next(8, 14),
+                    armor:  _rng.Next(3, 7)),
+                count: _rng.Next(5, 10))
+        };
 
         public List<Item> GetPossibleItems() => new List<Item>
         {
