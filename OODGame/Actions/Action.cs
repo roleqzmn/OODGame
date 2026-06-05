@@ -72,7 +72,14 @@ namespace OODGame.Actions
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
             bool isCombat = tile is EmptyTile emptyTile && emptyTile.HasEnemy;
-            Game.Player.InteractWithTile(tile);
+            if (isCombat)
+            {
+                Game.Player.InteractWithTile(tile);
+            }
+            else if (tile is EmptyTile interactTile && interactTile.Items.Count > 0)
+            {
+                ConsoleInteractionView.OpenTileItems(Game.Player, interactTile);
+            }
             if (isCombat)
                 Game.RedrawScreen();
             else
@@ -82,7 +89,7 @@ namespace OODGame.Actions
         private void OpenPlayerInventory()
         {
             Tile tile = Game.CurrentRoom.Grid[Game.Player.Ypos, Game.Player.Xpos];
-            Game.Player.OpenInventory(tile);
+            ConsoleInteractionView.OpenInventory(Game.Player, tile);
             Game.RefreshUI();
         }
         private void TryMove(int newX, int newY)

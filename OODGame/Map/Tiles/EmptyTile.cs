@@ -5,7 +5,6 @@ using OODGame.Entities;
 using OODGame.Events;
 using OODGame.Fight;
 using OODGame.Logger;
-using System;
 using System.Collections.Generic;
 
 namespace OODGame.Map
@@ -61,61 +60,7 @@ namespace OODGame.Map
                 return;
             }
 
-            if (Items.Count == 0)
-                return;
-
-            Draw.DrawItems(Items);
-            int i = 0;
-            Draw.DrawItem(Items[i]);
-
-            while (true)
-            {
-                var key = Console.ReadKey(true).Key;
-                switch (key)
-                {
-                    case ConsoleKey.Escape:
-                        Draw.EraseItems(Items);
-                        Draw.EraseItem();
-                        return;
-
-                    case ConsoleKey.LeftArrow:
-                        if (i > 0) i--;
-                        Draw.EraseItem();
-                        Draw.DrawItem(Items[i]);
-                        break;
-
-                    case ConsoleKey.RightArrow:
-                        if (i < Items.Count - 1) i++;
-                        Draw.EraseItem();
-                        Draw.DrawItem(Items[i]);
-                        break;
-
-                    case ConsoleKey.E:
-                        if (_playerActions.PickupFromTile(player, Items, i).Success)
-                        {
-                            UpdateSymbol();
-
-                            if (Items.Count == 0)
-                            {
-                                Draw.EraseItems(Items);
-                                Draw.EraseItem();
-                                return;
-                            }
-
-                            if (i >= Items.Count)
-                                i = Items.Count - 1;
-
-                            Draw.EraseItems(Items);
-                            Draw.EraseItem();
-                            Draw.DrawItems(Items);
-                            Draw.DrawItem(Items[i]);
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-            }
+            return;
         }
 
         public override bool CanInteract() => HasEnemy || Items.Count > 0;
@@ -130,6 +75,14 @@ namespace OODGame.Map
         {
             Enemy = null;
             UpdateSymbol();
+        }
+
+        public PlayerActionResult PickupItem(Player player, int itemIndex)
+        {
+            var result = _playerActions.PickupFromTile(player, Items, itemIndex);
+            if (result.Success)
+                UpdateSymbol();
+            return result;
         }
 
         public override void PlaceItem(Item item)

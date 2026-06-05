@@ -6,6 +6,7 @@ using OODGame.Items.Weapons;
 using OODGame.Map;
 using OODGame.Players;
 using OODGame.Actions;
+using OODGame.Input;
 using OODGame.Logger;
 using System;
 using System.Collections.Generic;
@@ -24,11 +25,13 @@ namespace OODGame
         public const int RoomWidth = 40;
         public const int RoomHeight = 20;
         private readonly IDungeonTheme _theme;
+        private readonly IInputSource _inputSource;
         private readonly Random _roomRandom = new Random();
         private Actions.Actions actions { get; set; }
         private string LogFile;
-        public Game(GameConfig config)
+        public Game(GameConfig config, IInputSource? inputSource = null)
         {
+            _inputSource = inputSource ?? new ConsoleInputSource();
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             string logDir = Path.GetDirectoryName(config.LogPath) ?? ".";
             LogFile = Path.Combine(logDir, $"{config.PlayerName}_{timestamp}.txt");
@@ -98,7 +101,7 @@ namespace OODGame
         }
         private void HandleInput()
         {
-            var key = Console.ReadKey(true).Key;
+            var key = _inputSource.ReadKey();
             actions.Handle(key);
         }
 

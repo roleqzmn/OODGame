@@ -1,5 +1,5 @@
 ﻿using OODGame.Items;
-using OODGame.Actions;
+using OODGame.Items;
 using OODGame.Map;
 using OODGame.Entities;
 using OODGame.Events;
@@ -48,6 +48,13 @@ namespace OODGame.Players
         public Armor? Boots { get; set; }
         public Armor? Gloves { get; set; }
     }
+
+    public enum WeaponHand
+    {
+        Left,
+        Right
+    }
+
     public class Player: IEntity
     {
         public int Xpos { get; set; }
@@ -100,11 +107,6 @@ namespace OODGame.Players
             Inventory.AddItem(item);
         }
 
-        public void OpenInventory(Tile tile)
-        {
-            Inventory.Open(this, tile);
-        }
-
         public void InteractWithTile(Tile tile)
         {
             if(tile.CanInteract())
@@ -112,6 +114,9 @@ namespace OODGame.Players
         }
 
         public bool EquipWeapon(Weapon item) //przenies do equpped item
+            => EquipWeapon(item, WeaponHand.Right);
+
+        public bool EquipWeapon(Weapon item, WeaponHand hand)
         {
             if (!item.CanEquip(this))
                 return false;
@@ -124,29 +129,19 @@ namespace OODGame.Players
                         ReturnToInventory(EItems.RightHand);
                     EItems.RightHand = null;
                 }
-                Draw.DrawHandChoice();
-                var choice = Console.ReadKey(true).Key;
-                Draw.EraseHandChoice();
 
-                if (choice == ConsoleKey.L)
+                if (hand == WeaponHand.Left)
                 {
                     if (EItems.LeftHand != null)
                         ReturnToInventory(EItems.LeftHand);
                     EItems.LeftHand = (Weapon)item;
-                    Draw.EraseEq();
-                    Draw.DrawEq(this);
                     return true;
                 }
-                else if (choice == ConsoleKey.R)
-                {
-                    if (EItems.RightHand != null)
-                        ReturnToInventory(EItems.RightHand);
-                    EItems.RightHand = (Weapon)item;
-                    Draw.EraseEq();
-                    Draw.DrawEq(this);
-                    return true;
-                }
-                return false;
+
+                if (EItems.RightHand != null)
+                    ReturnToInventory(EItems.RightHand);
+                EItems.RightHand = (Weapon)item;
+                return true;
             }
             else
             {
@@ -159,8 +154,6 @@ namespace OODGame.Players
 
                 EItems.RightHand = item;
                 EItems.LeftHand = null;
-                Draw.EraseEq();
-                Draw.DrawEq(this);
                 return true;
             }
         }

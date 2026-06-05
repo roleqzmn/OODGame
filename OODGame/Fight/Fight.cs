@@ -1,6 +1,7 @@
 ﻿using System;
 using OODGame.Entities;
 using OODGame.Fight.Actions;
+using OODGame.Input;
 using OODGame.Players;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace OODGame.Fight
     public class FightRunner
     {
         private readonly FightContext _ctx;
+        private readonly IInputSource _inputSource;
         private readonly List<IFightAction> _actions = new List<IFightAction>
         {
             new NormalFightAction(),
@@ -18,9 +20,10 @@ namespace OODGame.Fight
         };
         private int _selectedIdx = 0;
 
-        public FightRunner(Player player, Enemy enemy)
+        public FightRunner(Player player, Enemy enemy, IInputSource? inputSource = null)
         {
             _ctx = new FightContext(player, enemy);
+            _inputSource = inputSource ?? new ConsoleInputSource();
         }
 
         public bool Run()
@@ -42,7 +45,7 @@ namespace OODGame.Fight
 
         private void HandleInput()
         {
-            var key = Console.ReadKey(true).Key;
+            var key = _inputSource.ReadKey();
             switch (key)
             {
                 case ConsoleKey.UpArrow:
