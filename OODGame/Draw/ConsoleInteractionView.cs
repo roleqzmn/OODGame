@@ -1,4 +1,5 @@
 using OODGame.Actions;
+using OODGame.Input;
 using OODGame.Items;
 using OODGame.Logger;
 using OODGame.Map;
@@ -8,18 +9,19 @@ namespace OODGame
 {
     public static class ConsoleInteractionView
     {
-        public static void OpenTileItems(Player player, EmptyTile tile)
+        public static void OpenTileItems(Player player, EmptyTile tile, IInputSource? inputSource = null)
         {
             if (tile.Items.Count == 0)
                 return;
 
             int i = 0;
+            IInputSource source = inputSource ?? new ConsoleInputSource();
             Draw.DrawItems(tile.Items);
             Draw.DrawItem(tile.Items[i]);
 
             while (true)
             {
-                var key = Console.ReadKey(true).Key;
+                var key = source.ReadKey();
                 switch (key)
                 {
                     case ConsoleKey.Escape:
@@ -62,13 +64,14 @@ namespace OODGame
             }
         }
 
-        public static void OpenInventory(Player player, Tile tile)
+        public static void OpenInventory(Player player, Tile tile, IInputSource? inputSource = null)
         {
             var inventory = player.Inventory;
             var playerActions = new PlayerActions();
             if (inventory.Count == 0)
                 return;
 
+            IInputSource source = inputSource ?? new ConsoleInputSource();
             int i = 0;
             Draw.DrawItems(inventory.Items);
             Draw.DrawItemInv(inventory.Items[i], player);
@@ -76,7 +79,7 @@ namespace OODGame
             while (true)
             {
                 int size = inventory.Count;
-                var key = Console.ReadKey(true).Key;
+                var key = source.ReadKey();
 
                 switch (key)
                 {
@@ -101,7 +104,7 @@ namespace OODGame
                         if (inventory.Items[i].CanEquip(player))
                         {
                             var itemToEquip = inventory.Items[i];
-                            bool equipSuccess = TryEquipItem(player, itemToEquip);
+                            bool equipSuccess = TryEquipItem(player, itemToEquip, source);
                             if (equipSuccess)
                             {
                                 inventory.RemoveItem(itemToEquip);
@@ -144,14 +147,14 @@ namespace OODGame
             }
         }
 
-        private static bool TryEquipItem(Player player, Item item)
+        private static bool TryEquipItem(Player player, Item item, IInputSource inputSource)
         {
             if (item is Weapon weapon)
             {
                 if (!weapon.IsTwoHanded)
                 {
                     Draw.DrawHandChoice();
-                    var choice = Console.ReadKey(true).Key;
+                    var choice = inputSource.ReadKey();
                     Draw.EraseHandChoice();
 
                     if (choice == ConsoleKey.L)

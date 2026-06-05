@@ -44,14 +44,32 @@ namespace OODGame
 
         public static void DrawPlayer(Game game)
         {
-            Console.SetCursorPosition(game.Player.Xpos, game.Player.Ypos);
-            Console.Write(game.Player.Symbol);
+            DrawPlayer(game, game.Player, game.LocalPlayerId);
+        }
+
+        public static void DrawPlayer(Game game, Player player, int playerId)
+        {
+            Console.SetCursorPosition(player.Xpos, player.Ypos);
+            Console.Write(GetPlayerSymbol(playerId, player));
+        }
+
+        public static void DrawPlayers(Game game)
+        {
+            foreach (var entry in game.Players.OrderBy(entry => entry.Key))
+            {
+                DrawPlayer(game, entry.Value, entry.Key);
+            }
         }
 
         public static void ErasePlayer(Game game)
         {
-            Console.SetCursorPosition(game.Player.Xpos, game.Player.Ypos);
-            Console.Write(game.CurrentRoom.Grid[game.Player.Ypos, game.Player.Xpos].Symbol);
+            ErasePlayer(game, game.Player);
+        }
+
+        public static void ErasePlayer(Game game, Player player)
+        {
+            Console.SetCursorPosition(player.Xpos, player.Ypos);
+            Console.Write(game.CurrentRoom.Grid[player.Ypos, player.Xpos].Symbol);
         }
 
         public static void DrawUI(Game game)
@@ -232,7 +250,7 @@ namespace OODGame
                 Console.Write(game.CurrentRoom.Grid[y, x].Symbol);
             }
 
-            DrawPlayer(game);
+            DrawPlayers(game);
             DrawRecentLogs();
         }
 
@@ -240,10 +258,18 @@ namespace OODGame
         {
             Console.Clear();
             Draw.DrawRoom(game);
-            Draw.DrawPlayer(game);
+            Draw.DrawPlayers(game);
             Draw.DrawUI(game);
             Draw.DrawEq(game.Player);
             Draw.DrawRecentLogs();
+        }
+
+        private static char GetPlayerSymbol(int playerId, Player player)
+        {
+            if (playerId is >= 1 and <= 9)
+                return (char)('0' + playerId);
+
+            return player.Symbol;
         }
     }
 }
