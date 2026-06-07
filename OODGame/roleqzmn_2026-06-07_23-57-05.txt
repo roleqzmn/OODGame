@@ -1,9 +1,0 @@
-﻿[2026-06-07 23:57:33] Player picked up: Two-handed Axe (Unlucky) (Protective).
-[2026-06-07 23:57:33] Skeleton [Skeleton] heard Heavy noise at (28,12) from (26,9), distance: 5.
-[2026-06-07 23:57:35] Player2 equipped Two-handed Axe (Unlucky) (Protective).
-[2026-06-07 23:57:38] [Normal] Player2 dealt 18 to Skeleton; took 1.
-[2026-06-07 23:57:38] [Normal] Player2 dealt 18 to Skeleton; took 1.
-[2026-06-07 23:57:38] Player2 defeated Skeleton.
-[2026-06-07 23:57:41] [Normal] Player2 dealt 16 to Skeleton; took 1.
-[2026-06-07 23:57:41] [Normal] Player2 dealt 16 to Skeleton; took 1.
-[2026-06-07 23:57:41] Player2 defeated Skeleton.
