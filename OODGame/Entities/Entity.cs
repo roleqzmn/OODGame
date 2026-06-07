@@ -13,7 +13,7 @@ namespace OODGame.Entities
     public abstract class Enemy : IEntity, IGameEventSubscriber
     {
         public Guid Id { get; } = Guid.NewGuid();
-        public string Name { get; protected set; }
+        public string Name { get; protected set; } = string.Empty;
         public string Species { get; protected set; }
         public int Armor { get; protected set; }
         public int Damage { get; protected set; }

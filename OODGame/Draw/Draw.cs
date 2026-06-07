@@ -1,6 +1,7 @@
 using OODGame.Items;
 using OODGame.Dungeon;
 using OODGame.Map;
+using OODGame.Networking.Protocol;
 using OODGame.Players;
 using OODGame.Logger;
 using System;
@@ -262,6 +263,233 @@ namespace OODGame
             Draw.DrawUI(game);
             Draw.DrawEq(game.Player);
             Draw.DrawRecentLogs();
+        }
+
+        public static void DrawNetworkRoom(IReadOnlyList<string> rows)
+        {
+            for (int y = 0; y < rows.Count; y++)
+            {
+                Console.SetCursorPosition(0, y);
+                Console.Write(rows[y]);
+            }
+        }
+
+        public static void RedrawNetworkChangedCells(IReadOnlyList<string> previousRows, IReadOnlyList<string> currentRows)
+        {
+            int maxRows = Math.Max(previousRows.Count, currentRows.Count);
+            for (int y = 0; y < maxRows; y++)
+            {
+                string oldRow = y < previousRows.Count ? previousRows[y] : string.Empty;
+                string newRow = y < currentRows.Count ? currentRows[y] : string.Empty;
+                int maxCols = Math.Max(oldRow.Length, newRow.Length);
+
+                for (int x = 0; x < maxCols; x++)
+                {
+                    char oldChar = x < oldRow.Length ? oldRow[x] : ' ';
+                    char newChar = x < newRow.Length ? newRow[x] : ' ';
+                    if (oldChar == newChar)
+                        continue;
+
+                    Console.SetCursorPosition(x, y);
+                    Console.Write(newChar);
+                }
+            }
+        }
+
+        public static void DrawNetworkUI(PlayerStateDto player)
+        {
+            int X = 45;
+
+            Console.SetCursorPosition(X, 0);
+            Console.Write($"--- {player.Name} ---");
+
+            Console.SetCursorPosition(X, 2);
+            Console.Write($"Health: {player.Health}/{player.MaxHealth}    ");
+
+            Console.SetCursorPosition(X, 3);
+            Console.Write($"Load: {player.CurrentLoad}/{player.InventoryLimit}    ");
+
+            Console.SetCursorPosition(X, 4);
+            Console.Write($"Strength: {player.Strength}    ");
+
+            Console.SetCursorPosition(X, 5);
+            Console.Write($"Dexterity: {player.Dexterity}    ");
+
+            Console.SetCursorPosition(X, 6);
+            Console.Write($"Luck: {player.Luck}    ");
+
+            Console.SetCursorPosition(X, 7);
+            Console.Write($"Agression: {player.Aggression}    ");
+
+            Console.SetCursorPosition(X, 8);
+            Console.Write($"Wisdom: {player.Wisdom}    ");
+
+            Console.SetCursorPosition(X, 9);
+            Console.Write($"Coins: {player.Coins} | Gold: {player.Gold}    ");
+        }
+
+        public static void DrawNetworkEq(PlayerStateDto player)
+        {
+            Console.SetCursorPosition(70, 2);
+            if (player.LeftHand != null)
+            {
+                Console.Write($"Left Hand: {player.LeftHand.Name},");
+                Console.SetCursorPosition(75, 3);
+                Console.Write($"Damage:{player.LeftHand.Damage},");
+                Console.SetCursorPosition(75, 4);
+                Console.Write($"Range:{player.LeftHand.Range}      ");
+            }
+            else if (player.HasTwoHanded)
+            {
+                Console.Write("Two Handed                          ");
+            }
+            else
+            {
+                Console.Write("Left Hand: none                    ");
+            }
+
+            Console.SetCursorPosition(70, 6);
+            if (player.RightHand != null)
+            {
+                Console.Write($"Right Hand: {player.RightHand.Name},");
+                Console.SetCursorPosition(75, 7);
+                Console.Write($"Damage:{player.RightHand.Damage},");
+                Console.SetCursorPosition(75, 8);
+                Console.Write($"Range:{player.RightHand.Range}      ");
+            }
+            else
+            {
+                Console.Write("Right Hand: none                   ");
+            }
+        }
+
+        public static void DrawNetworkInventory(PlayerStateDto player, int selectedIndex, string preferredHand)
+        {
+            Console.SetCursorPosition(45, 11);
+            Console.Write(new string(' ', 50));
+            Console.SetCursorPosition(45, 11);
+
+            for (int i = 0; i < player.InventoryItems.Count; i++)
+            {
+                if (i == selectedIndex)
+                {
+                    Console.BackgroundColor = ConsoleColor.Gray;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                }
+
+                Console.Write($"{player.InventoryItems[i].Symbol}");
+                Console.ResetColor();
+                Console.Write(", ");
+            }
+
+            Console.SetCursorPosition(45, 13);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 14);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 15);
+            Console.Write(new string(' ', 65));
+
+            if (player.InventoryItems.Count == 0)
+            {
+                Console.SetCursorPosition(45, 13);
+                Console.Write("Inventory is empty.");
+                return;
+            }
+
+            int bounded = Math.Clamp(selectedIndex, 0, player.InventoryItems.Count - 1);
+            var selected = player.InventoryItems[bounded];
+            Console.SetCursorPosition(45, 13);
+            Console.Write($"{selected.Symbol}-{selected.Name}");
+            Console.SetCursorPosition(45, 14);
+            Console.Write($"Weight: {selected.Weight}");
+            Console.SetCursorPosition(45, 15);
+            Console.Write($"E = pickup, Q = drop, R = equip ({preferredHand.ToUpperInvariant()} hand)");
+        }
+
+        public static void DrawNetworkPickupItems(ItemTileStateDto tile, int selectedIndex, bool armed)
+        {
+            Console.SetCursorPosition(45, 11);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 11);
+
+            for (int i = 0; i < tile.Items.Count; i++)
+            {
+                if (i == selectedIndex)
+                {
+                    Console.BackgroundColor = ConsoleColor.Gray;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                }
+
+                Console.Write($"{tile.Items[i].Symbol}");
+                Console.ResetColor();
+                Console.Write(", ");
+            }
+
+            Console.SetCursorPosition(45, 13);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 14);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 15);
+            Console.Write(new string(' ', 65));
+
+            if (tile.Items.Count == 0)
+            {
+                Console.SetCursorPosition(45, 13);
+                Console.Write("No items on this tile.");
+                return;
+            }
+
+            int bounded = Math.Clamp(selectedIndex, 0, tile.Items.Count - 1);
+            var selected = tile.Items[bounded];
+            Console.SetCursorPosition(45, 13);
+            Console.Write($"{selected.Symbol}-{selected.Name}");
+            Console.SetCursorPosition(45, 14);
+            Console.Write($"Weight: {selected.Weight}");
+            Console.SetCursorPosition(45, 15);
+            Console.Write(armed
+                ? "Press E again to confirm pickup"
+                : "Press E to preview/arm pickup");
+        }
+
+        public static void ClearNetworkInventoryPanel()
+        {
+            Console.SetCursorPosition(45, 11);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 13);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 14);
+            Console.Write(new string(' ', 65));
+            Console.SetCursorPosition(45, 15);
+            Console.Write(new string(' ', 65));
+        }
+
+        public static void DrawNetworkFight(PlayerStateDto player, CombatStateDto combat, int selectedAction)
+        {
+            const int width = 60;
+
+            WriteNetworkAt(0, $"=== COMBAT: {combat.EnemyName} ===", width);
+            WriteNetworkAt(2, $"Enemy:  {combat.EnemyName,-15} HP: {combat.EnemyHealth,3}/{combat.EnemyMaxHealth,-3}  Armor: {combat.EnemyArmor}  Atk: {combat.EnemyDamage}", width);
+            WriteNetworkAt(4, $"Player: {player.Name,-15} HP: {player.Health,3}/{player.MaxHealth,-3}", width);
+            WriteNetworkAt(6, $"> {combat.LastLog,-58}", width);
+            WriteNetworkAt(8, "Choose action [Up/down = navigate, E = confirm]:", width);
+
+            for (int i = 0; i < combat.ActionNames.Count; i++)
+            {
+                Console.SetCursorPosition(2, 9 + i);
+                if (i == selectedAction)
+                {
+                    Console.BackgroundColor = ConsoleColor.Gray;
+                    Console.ForegroundColor = ConsoleColor.Black;
+                }
+                Console.Write($"[{i + 1}] {combat.ActionNames[i],-20}");
+                Console.ResetColor();
+            }
+        }
+
+        private static void WriteNetworkAt(int y, string text, int clearWidth)
+        {
+            Console.SetCursorPosition(0, y);
+            Console.Write(text.PadRight(clearWidth));
         }
 
         private static char GetPlayerSymbol(int playerId, Player player)

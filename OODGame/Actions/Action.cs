@@ -1,8 +1,12 @@
 ﻿using OODGame.Map;
+using OODGame.Map;
 using OODGame.Players;
+using OODGame.Items;
 using OODGame.Logger;
 using OODGame.Input;
 using OODGame.Networking.Protocol;
+using OODGame.Fight.Actions;
+using OODGame.Events;
 using System;
 using System.Collections.Generic;
 
@@ -12,6 +16,7 @@ namespace OODGame.Actions
     {
         Game Game { get; set; }
         private readonly IInputSource _inputSource;
+        private readonly PlayerActions _playerActions = new PlayerActions();
         private readonly HashSet<PlayerActionType> _turnActions;
         private int _turnCounter;
         public Actions(Game game, IInputSource inputSource)
@@ -24,8 +29,12 @@ namespace OODGame.Actions
                 PlayerActionType.MoveLeft,
                 PlayerActionType.MoveDown,
                 PlayerActionType.MoveRight,
+                PlayerActionType.PickupItem,
+                PlayerActionType.EquipItem,
+                PlayerActionType.Attack,
                 PlayerActionType.Interact,
-                PlayerActionType.OpenInventory
+                PlayerActionType.OpenInventory,
+                PlayerActionType.DropItem
             };
             _turnCounter = 0;
         }
@@ -42,9 +51,15 @@ namespace OODGame.Actions
             }
         }
 
-        public bool ApplyPlayerAction(int playerId, PlayerActionType actionType)
+        public bool ApplyPlayerAction(int playerId, PlayerActionType actionType, int? itemIndex = null, string? preferredHand = null)
         {
             if (!Game.TryGetPlayer(playerId, out Player player))
+                return false;
+
+            if (!Game.HasLocalPlayer && !IsServerSafeAction(actionType))
+                return false;
+
+            if (!Game.HasLocalPlayer && Game.IsPlayerInCombat(playerId) && actionType is not PlayerActionType.Attack and not PlayerActionType.Quit)
                 return false;
 
             bool handled;
@@ -62,6 +77,15 @@ namespace OODGame.Actions
                 case PlayerActionType.MoveRight:
                     handled = TryMove(playerId, player.Xpos + 1, player.Ypos);
                     break;
+                case PlayerActionType.PickupItem:
+                    handled = PickupItemFromTile(playerId, itemIndex ?? 0);
+                    break;
+                case PlayerActionType.EquipItem:
+                    handled = EquipInventoryItem(playerId, itemIndex ?? 0, preferredHand);
+                    break;
+                case PlayerActionType.Attack:
+                    handled = AttackEnemy(playerId, itemIndex ?? 0);
+                    break;
                 case PlayerActionType.Interact:
                     handled = InteractWithTile(playerId);
                     break;
@@ -71,6 +95,9 @@ namespace OODGame.Actions
                 case PlayerActionType.ShowLog:
                     ShowFullLog();
                     handled = true;
+                    break;
+                case PlayerActionType.DropItem:
+                    handled = DropInventoryItem(playerId, itemIndex ?? 0);
                     break;
                 case PlayerActionType.Quit:
                     QuitGame();
@@ -83,16 +110,34 @@ namespace OODGame.Actions
 
             if (handled && _turnActions.Contains(actionType) && Game.IsRunning)
             {
-                _turnCounter++;
-                if (_turnCounter >= 3)
+                bool canAdvanceWorldTick = !Game.HasActiveCombats();
+                if (canAdvanceWorldTick)
                 {
-                    var changedPositions = EnemyMovementService.MoveEnemiesRandomly(Game.CurrentRoom, player.Xpos, player.Ypos);
-                    Draw.RedrawChangedPositions(Game, changedPositions);
-                    _turnCounter = 0;
+                    _turnCounter++;
+                    if (_turnCounter >= 3)
+                    {
+                        var changedPositions = EnemyMovementService.MoveEnemiesRandomly(Game.CurrentRoom, player.Xpos, player.Ypos);
+                        Draw.RedrawChangedPositions(Game, changedPositions);
+                        _turnCounter = 0;
+                    }
                 }
             }
 
             return handled;
+        }
+
+        private static bool IsServerSafeAction(PlayerActionType actionType)
+        {
+            return actionType is PlayerActionType.MoveUp
+                or PlayerActionType.MoveDown
+                or PlayerActionType.MoveLeft
+                or PlayerActionType.MoveRight
+                or PlayerActionType.PickupItem
+                or PlayerActionType.EquipItem
+                or PlayerActionType.Attack
+                or PlayerActionType.Interact
+                or PlayerActionType.DropItem
+                or PlayerActionType.Quit;
         }
 
         private static bool TryMapKeyToAction(ConsoleKey key, out PlayerActionType actionType)
@@ -112,13 +157,22 @@ namespace OODGame.Actions
                     actionType = PlayerActionType.MoveRight;
                     return true;
                 case ConsoleKey.E:
-                    actionType = PlayerActionType.Interact;
+                    actionType = PlayerActionType.PickupItem;
+                    return true;
+                case ConsoleKey.R:
+                    actionType = PlayerActionType.EquipItem;
+                    return true;
+                case ConsoleKey.F:
+                    actionType = PlayerActionType.Attack;
                     return true;
                 case ConsoleKey.I:
                     actionType = PlayerActionType.OpenInventory;
                     return true;
                 case ConsoleKey.J:
                     actionType = PlayerActionType.ShowLog;
+                    return true;
+                case ConsoleKey.Q:
+                    actionType = PlayerActionType.DropItem;
                     return true;
                 case ConsoleKey.Escape:
                     actionType = PlayerActionType.Quit;
@@ -127,6 +181,100 @@ namespace OODGame.Actions
                     actionType = default;
                     return false;
             }
+        }
+
+        private bool AttackEnemy(int playerId, int attackIndex)
+        {
+            if (!Game.TryGetPlayer(playerId, out Player player))
+                return false;
+
+            if (!Game.HasLocalPlayer && Game.TryGetCombatSession(playerId, out Game.CombatSession? combatSession))
+                return ResolveServerCombatTurn(playerId, player, combatSession, attackIndex);
+
+            if (!TryFindAttackTargetTile(player, out EmptyTile? combatTile) || combatTile is null)
+                return false;
+
+            if (!Game.HasLocalPlayer)
+            {
+                Game.TryStartCombat(playerId, combatTile);
+                if (Game.TryGetCombatSession(playerId, out Game.CombatSession? startedSession))
+                    return ResolveServerCombatTurn(playerId, player, startedSession, attackIndex);
+                return false;
+            }
+
+            player.InteractWithTile(combatTile);
+            Game.RedrawScreen();
+            return true;
+        }
+
+        private bool TryFindAttackTargetTile(Player player, out EmptyTile? tile)
+        {
+            tile = null;
+
+            if (Game.CurrentRoom.Grid[player.Ypos, player.Xpos] is EmptyTile current && current.HasEnemy)
+            {
+                tile = current;
+                return true;
+            }
+
+            ReadOnlySpan<(int dx, int dy)> offsets =
+            [
+                (0, -1),
+                (1, 0),
+                (0, 1),
+                (-1, 0)
+            ];
+
+            foreach (var (dx, dy) in offsets)
+            {
+                int x = player.Xpos + dx;
+                int y = player.Ypos + dy;
+
+                if (x < 0 || x >= Game.RoomWidth || y < 0 || y >= Game.RoomHeight)
+                    continue;
+
+                if (Game.CurrentRoom.Grid[y, x] is EmptyTile adjacent && adjacent.HasEnemy)
+                {
+                    tile = adjacent;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool ResolveServerCombatTurn(int playerId, Player player, Game.CombatSession combatSession, int attackIndex)
+        {
+            if (!combatSession.Tile.HasEnemy || combatSession.Tile.Enemy is null)
+            {
+                Game.EndCombat(playerId);
+                return false;
+            }
+
+            int bounded = Math.Clamp(attackIndex, 0, 2);
+            IFightAction action = combatSession.CreateAction(bounded);
+            action.Execute(combatSession.Context);
+
+            var enemy = combatSession.Context.Enemy;
+            if (enemy.Health <= 0)
+            {
+                player.EventBus?.Publish(new EnemyDeathEvent(enemy.Id, enemy.Species));
+                player.EventBus?.Unsubscribe(enemy);
+                enemy.ClearSpatialContext();
+                combatSession.Tile.RemoveEnemy();
+                EventLogger.Instance?.LogEvent($"{player.Name} defeated {enemy.Name}.");
+                Game.EndCombat(playerId);
+                return true;
+            }
+
+            if (player.Stats.Health <= 0)
+            {
+                Game.EndCombat(playerId);
+                Game.RemovePlayer(playerId);
+                EventLogger.Instance?.LogEvent($"{player.Name} was defeated.");
+            }
+
+            return true;
         }
 
         private void ShowFullLog()
@@ -147,20 +295,104 @@ namespace OODGame.Actions
 
             Tile tile = Game.CurrentRoom.Grid[player.Ypos, player.Xpos];
             bool isCombat = tile is EmptyTile emptyTile && emptyTile.HasEnemy;
+
+            if (!Game.HasLocalPlayer)
+            {
+                if (isCombat && tile is EmptyTile serverCombatTile)
+                    return Game.TryStartCombat(playerId, serverCombatTile);
+                return false;
+            }
+
             if (isCombat)
             {
                 player.InteractWithTile(tile);
+                Game.RedrawScreen();
+                return true;
             }
-            else if (tile is EmptyTile interactTile && interactTile.Items.Count > 0)
+
+            if (tile is EmptyTile interactTile && interactTile.Items.Count > 0)
             {
                 ConsoleInteractionView.OpenTileItems(player, interactTile, _inputSource);
+                Game.RefreshUI();
+                return true;
             }
-            if (isCombat)
-                Game.RedrawScreen();
+
+            return false;
+        }
+
+        private bool PickupItemFromTile(int playerId, int itemIndex)
+        {
+            if (!Game.TryGetPlayer(playerId, out Player player))
+                return false;
+
+            Tile tile = Game.CurrentRoom.Grid[player.Ypos, player.Xpos];
+            if (tile is not EmptyTile emptyTile || emptyTile.Items.Count == 0)
+                return false;
+
+            int boundedIndex = Math.Clamp(itemIndex, 0, emptyTile.Items.Count - 1);
+            PlayerActionResult result = emptyTile.PickupItem(player, boundedIndex);
+
+            if (result.Success && Game.HasLocalPlayer)
+                Game.RefreshUI();
+
+            return result.Success;
+        }
+
+        private bool EquipInventoryItem(int playerId, int itemIndex, string? preferredHand)
+        {
+            if (!Game.TryGetPlayer(playerId, out Player player))
+                return false;
+
+            if (player.Inventory.Count == 0)
+                return false;
+
+            int boundedIndex = Math.Clamp(itemIndex, 0, player.Inventory.Count - 1);
+            Item item = player.Inventory[boundedIndex];
+            if (!item.CanEquip(player))
+                return false;
+
+            bool equipped;
+            if (item is Weapon weapon)
+            {
+                WeaponHand hand = string.Equals(preferredHand, "left", StringComparison.OrdinalIgnoreCase)
+                    ? WeaponHand.Left
+                    : WeaponHand.Right;
+                equipped = player.EquipWeapon(weapon, hand);
+            }
             else
+            {
+                equipped = item.Equip(player);
+            }
+
+            if (!equipped)
+                return false;
+
+            player.Inventory.RemoveItem(item);
+            EventLogger.Instance?.LogEvent($"{player.Name} equipped {item.Name}.");
+
+            if (Game.HasLocalPlayer)
                 Game.RefreshUI();
 
             return true;
+        }
+
+        private bool DropInventoryItem(int playerId, int itemIndex)
+        {
+            if (!Game.TryGetPlayer(playerId, out Player player))
+                return false;
+
+            if (player.Inventory.Count == 0)
+                return false;
+
+            int boundedIndex = Math.Clamp(itemIndex, 0, player.Inventory.Count - 1);
+
+            Tile tile = Game.CurrentRoom.Grid[player.Ypos, player.Xpos];
+            PlayerActionResult result = _playerActions.DropFromInventory(player, tile, boundedIndex);
+
+            if (result.Success && Game.HasLocalPlayer)
+                Game.RefreshUI();
+
+            return result.Success;
         }
 
         private bool OpenPlayerInventory(int playerId)
@@ -177,6 +409,12 @@ namespace OODGame.Actions
         {
             if (!Game.TryGetPlayer(playerId, out Player player))
                 return false;
+
+            if (!Game.HasLocalPlayer && (newX < 0 || newX >= Game.RoomWidth || newY < 0 || newY >= Game.RoomHeight))
+            {
+                EventLogger.Instance?.LogEvent($"{player.Name} tried to leave shared room bounds.");
+                return false;
+            }
 
             if (newX == player.Xpos && newY == player.Ypos)
             {
@@ -244,6 +482,13 @@ namespace OODGame.Actions
 
                     if (targetTile is EmptyTile emptyTile && emptyTile.HasEnemy)
                     {
+                        if (!Game.HasLocalPlayer)
+                        {
+                            Game.TryStartCombat(playerId, emptyTile);
+                            Draw.DrawPlayers(Game);
+                            return true;
+                        }
+
                         player.InteractWithTile(targetTile);
                         Game.RedrawScreen();
                     }
