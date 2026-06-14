@@ -471,7 +471,7 @@ namespace OODGame
             WriteNetworkAt(2, $"Enemy:  {combat.EnemyName,-15} HP: {combat.EnemyHealth,3}/{combat.EnemyMaxHealth,-3}  Armor: {combat.EnemyArmor}  Atk: {combat.EnemyDamage}", width);
             WriteNetworkAt(4, $"Player: {player.Name,-15} HP: {player.Health,3}/{player.MaxHealth,-3}", width);
             WriteNetworkAt(6, $"> {combat.LastLog,-58}", width);
-            WriteNetworkAt(8, "Choose action [Up/down = navigate, E = confirm]:", width);
+            WriteNetworkAt(8, "Choose action [Up/down = navigate, E = confirm, R = leave]:", width);
 
             for (int i = 0; i < combat.ActionNames.Count; i++)
             {

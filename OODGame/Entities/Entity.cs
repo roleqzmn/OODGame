@@ -5,6 +5,20 @@ using OODGame.Map;
 
 namespace OODGame.Entities
 {
+    public enum EnemyTemperament
+    {
+        Aggressive,
+        Cowardly,
+        Other
+    }
+
+    public enum EnemyReactionMode
+    {
+        Follow,
+        Flee,
+        Ignore
+    }
+
     public interface IEntity
     {
         string Name { get; }
@@ -19,9 +33,13 @@ namespace OODGame.Entities
         public int Damage { get; protected set; }
         public int MaxHealth { get; protected set; }
         public int Health { get; set; }
+        public EnemyTemperament Temperament { get; protected set; } = EnemyTemperament.Other;
+        public EnemyReactionMode SoundReaction { get; protected set; } = EnemyReactionMode.Ignore;
+        public EnemyReactionMode PlayerReaction { get; protected set; } = EnemyReactionMode.Ignore;
         public int Xpos { get; private set; } = -1;
         public int Ypos { get; private set; } = -1;
         public IMapNavigator? Navigator { get; private set; }
+        public (int x, int y)? LastHeardSound { get; private set; }
 
         public bool IsAlive => Health > 0;
 
@@ -43,6 +61,30 @@ namespace OODGame.Entities
             Xpos = -1;
             Ypos = -1;
             Navigator = null;
+            LastHeardSound = null;
+        }
+
+        public void ClearLastHeardSound()
+        {
+            LastHeardSound = null;
+        }
+
+        public void NotifyAttacked()
+        {
+            if (Temperament != EnemyTemperament.Other)
+                return;
+
+            double hpRatio = MaxHealth <= 0 ? 1.0 : (double)Health / MaxHealth;
+            if (hpRatio >= 0.5)
+            {
+                SoundReaction = EnemyReactionMode.Follow;
+                PlayerReaction = EnemyReactionMode.Follow;
+            }
+            else
+            {
+                SoundReaction = EnemyReactionMode.Flee;
+                PlayerReaction = EnemyReactionMode.Flee;
+            }
         }
 
         public void OnEvent(IGameEvent gameEvent)
@@ -65,6 +107,9 @@ namespace OODGame.Entities
 
         protected virtual void OnNoiseBroadcast(NoiseBroadcastEvent noiseEvent)
         {
+            if (SoundReaction == EnemyReactionMode.Ignore)
+                return;
+
             if (Navigator == null || Xpos < 0 || Ypos < 0)
                 return;
 
@@ -75,6 +120,8 @@ namespace OODGame.Entities
 
             if (!distance.HasValue)
                 return;
+
+            LastHeardSound = (noiseEvent.SourceX, noiseEvent.SourceY);
 
             EventLogger.Instance?.LogEvent(
                 $"{Name} [{Species}] heard {noiseEvent.Category} noise at ({noiseEvent.SourceX},{noiseEvent.SourceY}) from ({Xpos},{Ypos}), distance: {distance.Value}.");

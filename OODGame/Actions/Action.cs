@@ -9,6 +9,7 @@ using OODGame.Fight.Actions;
 using OODGame.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace OODGame.Actions
 {
@@ -59,7 +60,7 @@ namespace OODGame.Actions
             if (!Game.HasLocalPlayer && !IsServerSafeAction(actionType))
                 return false;
 
-            if (!Game.HasLocalPlayer && Game.IsPlayerInCombat(playerId) && actionType is not PlayerActionType.Attack and not PlayerActionType.Quit)
+            if (!Game.HasLocalPlayer && Game.IsPlayerInCombat(playerId) && actionType is not PlayerActionType.Attack and not PlayerActionType.Interact and not PlayerActionType.Quit)
                 return false;
 
             bool handled;
@@ -116,7 +117,25 @@ namespace OODGame.Actions
                     _turnCounter++;
                     if (_turnCounter >= 3)
                     {
-                        var changedPositions = EnemyMovementService.MoveEnemiesRandomly(Game.CurrentRoom, player.Xpos, player.Ypos);
+                        var changedPositions = EnemyMovementService.MoveEnemies(Game.CurrentRoom, Game.Players.Values.ToList());
+                        var defeatedPlayerIds = Game.Players
+                            .Where(entry => entry.Value.Stats.Health <= 0)
+                            .Select(entry => entry.Key)
+                            .ToList();
+
+                        foreach (int defeatedId in defeatedPlayerIds)
+                        {
+                            if (Game.HasLocalPlayer && defeatedId == Game.LocalPlayerId)
+                            {
+                                EventLogger.Instance?.LogEvent("You were defeated by an enemy.");
+                                Game.IsRunning = false;
+                            }
+                            else
+                            {
+                                Game.RemovePlayer(defeatedId);
+                            }
+                        }
+
                         Draw.RedrawChangedPositions(Game, changedPositions);
                         _turnCounter = 0;
                     }
@@ -292,6 +311,13 @@ namespace OODGame.Actions
         {
             if (!Game.TryGetPlayer(playerId, out Player player))
                 return false;
+
+            if (!Game.HasLocalPlayer && Game.IsPlayerInCombat(playerId))
+            {
+                Game.EndCombat(playerId);
+                EventLogger.Instance?.LogEvent($"{player.Name} disengaged from combat.");
+                return true;
+            }
 
             Tile tile = Game.CurrentRoom.Grid[player.Ypos, player.Xpos];
             bool isCombat = tile is EmptyTile emptyTile && emptyTile.HasEnemy;

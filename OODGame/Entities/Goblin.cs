@@ -12,6 +12,9 @@ namespace OODGame.Entities
             Health    = 30;
             Damage    = 5;
             Armor     = 2;
+            Temperament = EnemyTemperament.Cowardly;
+            SoundReaction = EnemyReactionMode.Flee;
+            PlayerReaction = EnemyReactionMode.Flee;
         }
 
         public Goblin(int health, int damage, int armor)
@@ -22,6 +25,9 @@ namespace OODGame.Entities
             Health    = health;
             Damage    = damage;
             Armor     = armor;
+            Temperament = EnemyTemperament.Cowardly;
+            SoundReaction = EnemyReactionMode.Flee;
+            PlayerReaction = EnemyReactionMode.Flee;
         }
 
         protected override void OnAllyDeath()

@@ -126,13 +126,19 @@ namespace OODGame.Networking.Client
                         continue;
                     }
 
+                    if (key == ConsoleKey.R)
+                    {
+                        await SendActionAsync(channel, PlayerActionType.Interact, 0, cancellationToken).ConfigureAwait(false);
+                        continue;
+                    }
+
                     if (key == ConsoleKey.Escape)
                     {
                         await SendActionAsync(channel, PlayerActionType.Quit, 0, cancellationToken).ConfigureAwait(false);
                         break;
                     }
 
-                    RenderState("In combat: use Up/Down and E.");
+                    RenderState("In combat: use Up/Down + E to attack, R to leave.");
                     continue;
                 }
 

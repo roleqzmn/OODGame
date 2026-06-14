@@ -10,6 +10,9 @@ namespace OODGame.Entities
             Health    = 50;
             Damage    = 10;
             Armor     = 5;
+            Temperament = EnemyTemperament.Aggressive;
+            SoundReaction = EnemyReactionMode.Follow;
+            PlayerReaction = EnemyReactionMode.Follow;
         }
 
         public Demon(int health, int damage, int armor)
@@ -20,6 +23,9 @@ namespace OODGame.Entities
             Health    = health;
             Damage    = damage;
             Armor     = armor;
+            Temperament = EnemyTemperament.Aggressive;
+            SoundReaction = EnemyReactionMode.Follow;
+            PlayerReaction = EnemyReactionMode.Follow;
         }
     }
 }

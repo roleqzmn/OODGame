@@ -14,6 +14,7 @@ namespace OODGame.Fight.Actions
             int taken  = Math.Max(1, ctx.Enemy.Damage - ctx.GetDefense(visitor));
 
             ctx.Enemy.Health -= dealt;
+            ctx.Enemy.NotifyAttacked();
             ctx.Player.Stats.Health -= taken;
             ctx.LastLog = $"Stealth attack: dealt {dealt}, took {taken}.";
 

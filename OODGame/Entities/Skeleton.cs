@@ -10,6 +10,9 @@ namespace OODGame.Entities
             Health    = 20;
             Damage    = 8;
             Armor     = 1;
+            Temperament = EnemyTemperament.Other;
+            SoundReaction = EnemyReactionMode.Ignore;
+            PlayerReaction = EnemyReactionMode.Ignore;
         }
 
         public Skeleton(int health, int damage, int armor)
@@ -20,6 +23,9 @@ namespace OODGame.Entities
             Health    = health;
             Damage    = damage;
             Armor     = armor;
+            Temperament = EnemyTemperament.Other;
+            SoundReaction = EnemyReactionMode.Ignore;
+            PlayerReaction = EnemyReactionMode.Ignore;
         }
 
         protected override void OnAllyDeath()

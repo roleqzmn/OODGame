@@ -1,0 +1,2 @@
+﻿[2026-06-15 00:52:27] Player picked up: Rusty Knife.
+[2026-06-15 00:52:30] Player picked up: Sword (Protective).
